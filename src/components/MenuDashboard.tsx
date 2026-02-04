@@ -1,0 +1,217 @@
+import React from "react";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+
+// --- INTERFACES ---
+interface Operacion {
+  estado: "P" | "A" | "C" | "B" | "F" | "R";
+  fechacup: string;
+}
+interface Silo {
+  nombre: string;
+  stock: number;
+  capacidad: number;
+}
+
+interface DashboardProps {
+  alSeleccionar: (vista: string) => void;
+}
+
+export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
+  const [operaciones] = useLocalStorage<Operacion[]>("operaciones_dat", []);
+  const [silos] = useLocalStorage<Silo[]>("silos_dat", []);
+
+  const hoy = new Date().toISOString().split("T")[0];
+
+  // --- MÉTRICAS ---
+  const cuposHoy = operaciones.filter((op) => op.fechacup === hoy).length;
+  const enPuerta = operaciones.filter(
+    (op) => op.fechacup === hoy && op.estado === "P",
+  ).length;
+  const paraCalidad = operaciones.filter(
+    (op) => op.fechacup === hoy && op.estado === "A",
+  ).length;
+  const paraBalanza = operaciones.filter(
+    (op) => op.fechacup === hoy && (op.estado === "C" || op.estado === "B"),
+  ).length;
+
+  // Alerta Silos (>90% ocupación)
+  const silosCriticos = silos.filter(
+    (s) => s.capacidad > 0 && s.stock / s.capacidad > 0.9,
+  ).length;
+
+  return (
+    <div className="min-h-screen bg-black p-8 font-mono flex flex-col items-center justify-center">
+      {/* HEADER */}
+      <div className="w-full max-w-5xl mb-8 border-b-2 border-white/20 pb-4 flex justify-between items-end animate-in slide-in-from-top-4 duration-700">
+        <div>
+          <h1 className="text-3xl md:text-4xl text-white font-bold tracking-[0.2em] uppercase italic text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+            Sistema Logístico
+          </h1>
+          <p className="text-cyan-500 text-xs md:text-sm mt-1 tracking-widest font-bold">
+            CENTRO DE COMANDO V3.0
+          </p>
+        </div>
+        <div className="text-right hidden md:block">
+          <p className="text-gray-500 text-[10px] uppercase font-bold">
+            Fecha Operativa
+          </p>
+          <p className="text-white font-bold text-lg">
+            {new Date().toLocaleDateString()}
+          </p>
+        </div>
+      </div>
+
+      {/* GRID DE BOTONES */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full max-w-5xl">
+        {/* 1. ADMINISTRACIÓN (Cyan) */}
+        <button
+          onClick={() => alSeleccionar("ADMIN")}
+          className="group relative p-6 border border-gray-800 bg-gray-900/40 hover:bg-gray-900 hover:border-cyan-500 transition-all duration-300 text-left overflow-hidden shadow-lg hover:shadow-cyan-900/20"
+        >
+          {/* Se eliminó el icono de engranaje */}
+          <h3 className="text-cyan-500 font-bold text-lg mb-1 group-hover:translate-x-1 transition-transform tracking-wider">
+            ADMINISTRACIÓN
+          </h3>
+          <p className="text-gray-500 text-[10px] uppercase">
+            Configuración General
+          </p>
+        </button>
+
+        {/* 2. CUPOS (Blanco) */}
+        <button
+          onClick={() => alSeleccionar("CUPOS")}
+          className="group relative p-6 border border-gray-800 bg-gray-900/40 hover:bg-gray-900 hover:border-white transition-all duration-300 text-left shadow-lg"
+        >
+          <div className="flex justify-between items-start mb-1">
+            <h3 className="text-white font-bold text-lg group-hover:translate-x-1 transition-transform tracking-wider">
+              CUPOS
+            </h3>
+            <span className="bg-gray-800 text-white border border-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-sm">
+              TOTAL HOY: {cuposHoy}
+            </span>
+          </div>
+          <p className="text-gray-500 text-[10px] uppercase">
+            Asignación de turnos
+          </p>
+        </button>
+
+        {/* 3. RECEPCIÓN (Amarillo) */}
+        <button
+          onClick={() => alSeleccionar("RECEPCION")}
+          className="group relative p-6 border border-gray-800 bg-gray-900/40 hover:bg-gray-900 hover:border-yellow-500 transition-all duration-300 text-left shadow-lg hover:shadow-yellow-900/20"
+        >
+          <div className="flex justify-between items-start mb-1">
+            <h3 className="text-yellow-500 font-bold text-lg group-hover:translate-x-1 transition-transform tracking-wider">
+              RECEPCIÓN
+            </h3>
+            {enPuerta > 0 ? (
+              <span className="bg-yellow-900/40 text-yellow-500 border border-yellow-600 text-[10px] font-bold px-2 py-0.5 rounded-sm animate-pulse">
+                EN PUERTA: {enPuerta}
+              </span>
+            ) : (
+              <span className="text-gray-600 text-[10px] font-bold">
+                SIN PENDIENTES
+              </span>
+            )}
+          </div>
+          <p className="text-gray-500 text-[10px] uppercase">
+            Ingreso de Unidades
+          </p>
+        </button>
+
+        {/* 4. CALIDAD (Violeta) */}
+        <button
+          onClick={() => alSeleccionar("CALIDAD")}
+          className="group relative p-6 border border-gray-800 bg-gray-900/40 hover:bg-gray-900 hover:border-violet-500 transition-all duration-300 text-left shadow-lg hover:shadow-violet-900/20"
+        >
+          <div className="flex justify-between items-start mb-1">
+            <h3 className="text-violet-500 font-bold text-lg group-hover:translate-x-1 transition-transform tracking-wider">
+              CALIDAD
+            </h3>
+            {paraCalidad > 0 && (
+              <span className="bg-violet-900/40 text-violet-400 border border-violet-500 text-[10px] font-bold px-2 py-0.5 rounded-sm animate-pulse">
+                A CALAR: {paraCalidad}
+              </span>
+            )}
+          </div>
+          <p className="text-gray-500 text-[10px] uppercase">
+            Laboratorio y Análisis
+          </p>
+        </button>
+
+        {/* 5. BALANZA (Esmeralda/Verde) */}
+        <button
+          onClick={() => alSeleccionar("PESAJE")}
+          className="group relative p-6 border border-gray-800 bg-gray-900/40 hover:bg-gray-900 hover:border-emerald-500 transition-all duration-300 text-left shadow-lg hover:shadow-emerald-900/20"
+        >
+          <div className="flex justify-between items-start mb-1">
+            <h3 className="text-emerald-500 font-bold text-lg group-hover:translate-x-1 transition-transform tracking-wider">
+              BALANZA
+            </h3>
+            {paraBalanza > 0 && (
+              <span className="bg-emerald-900/40 text-emerald-500 border border-emerald-500 text-[10px] font-bold px-2 py-0.5 rounded-sm animate-pulse">
+                EN COLA: {paraBalanza}
+              </span>
+            )}
+          </div>
+          <p className="text-gray-500 text-[10px] uppercase">Control de Peso</p>
+        </button>
+
+        {/* 6. MONITOR Y REPORTES (Naranja/Rojo) */}
+        <div className="grid grid-rows-2 gap-4">
+          <button
+            onClick={() => alSeleccionar("SILOS_RECHAZOS")}
+            className={`group px-6 py-3 border bg-gray-900/40 transition-all duration-300 text-left flex justify-between items-center ${silosCriticos > 0 ? "border-red-600 animate-pulse bg-red-900/10" : "border-gray-800 hover:border-orange-500"}`}
+          >
+            <div>
+              <h3 className="text-orange-500 font-bold text-sm tracking-wider">
+                MONITOR SILOS
+              </h3>
+              {silosCriticos > 0 ? (
+                <span className="text-[9px] text-red-500 font-bold uppercase">
+                  ⚠ {silosCriticos} SILO(S) CRÍTICO(S)
+                </span>
+              ) : (
+                <span className="text-[9px] text-gray-500 uppercase font-bold">
+                  ESTADO NORMAL
+                </span>
+              )}
+            </div>
+            {/* Se eliminó el icono de fábrica */}
+          </button>
+
+          <button
+            onClick={() => alSeleccionar("REPORTES")}
+            className="group px-6 py-3 border border-gray-800 bg-gray-900/40 hover:border-red-500 transition-all duration-300 text-left flex justify-between items-center"
+          >
+            <div>
+              <h3 className="text-red-500 font-bold text-sm tracking-wider">
+                REPORTES
+              </h3>
+              <span className="text-[9px] text-gray-500 uppercase">
+                Estadísticas y KPI
+              </span>
+            </div>
+            {/* Se eliminó el icono de gráfico */}
+          </button>
+        </div>
+      </div>
+
+      {/* FOOTER */}
+      <div className="mt-12 w-full max-w-5xl flex justify-between items-center border-t border-gray-800 pt-6">
+        <div className="text-[10px] text-gray-600">
+          SISTEMA OPERATIVO V3.0 •{" "}
+          <span className="text-emerald-500 font-bold">ONLINE</span>
+        </div>
+        <button
+          onClick={() =>
+            window.confirm("¿Cerrar sesión del sistema?") && window.close()
+          }
+          className="text-[10px] font-bold text-red-900 hover:text-red-500 transition-colors uppercase tracking-widest"
+        >
+          [ CERRAR SESIÓN ]
+        </button>
+      </div>
+    </div>
+  );
+};

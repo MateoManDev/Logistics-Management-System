@@ -131,14 +131,14 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
       <div
         className={`flex items-center justify-center min-h-screen w-full bg-black p-4 transition-all duration-300 ${modal.isOpen ? "opacity-60 blur-[2px] pointer-events-none scale-[0.99]" : "opacity-100 blur-0 scale-100"}`}
       >
-        <div className="border-2 border-cyan-500 p-8 bg-gray-900 shadow-[0_0_20px_rgba(6,182,212,0.2)] w-full max-w-md">
-          <h2 className="text-center mb-8 text-xl font-bold tracking-[0.2em] text-cyan-400 border-b-2 border-cyan-900 pb-4 uppercase italic">
+        <div className="border-2 border-violet-600 p-8 bg-gray-900 shadow-[0_0_20px_rgba(139,92,246,0.2)] w-full max-w-md">
+          <h2 className="text-center mb-8 text-xl font-bold tracking-[0.2em] text-violet-500 border-b-2 border-violet-900 pb-4 uppercase italic">
             [ Registrar Calidad ]
           </h2>
 
           {!operacionActiva ? (
             <div className="flex flex-col gap-4">
-              <label className="text-[10px] text-cyan-700 uppercase tracking-widest font-bold">
+              <label className="text-[10px] text-violet-500 uppercase tracking-widest font-bold">
                 Unidades en Playa esperando Calada:
               </label>
               <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
@@ -147,7 +147,7 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
                     <button
                       key={op.patente}
                       onClick={() => seleccionarCamion(op)}
-                      className="flex justify-between items-center p-3 border border-gray-800 bg-black hover:border-cyan-500 transition-all group text-left"
+                      className="flex justify-between items-center p-3 border border-gray-800 bg-black hover:border-violet-500 transition-all group text-left"
                     >
                       <div className="flex flex-col">
                         <span className="text-white font-bold">
@@ -157,7 +157,7 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
                           {op.codprod}
                         </span>
                       </div>
-                      <span className="text-[9px] font-bold text-cyan-600 border border-cyan-900 px-2 py-1 uppercase">
+                      <span className="text-[9px] font-bold text-violet-500 border border-violet-900 px-2 py-1 uppercase group-hover:bg-violet-900 group-hover:text-black transition-colors">
                         Analizar
                       </span>
                     </button>
@@ -173,7 +173,7 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
             <div className="flex flex-col gap-5 animate-in slide-in-from-bottom duration-300">
               <div className="text-white text-[10px] border-b border-gray-800 pb-2 flex justify-between uppercase font-bold">
                 <span>UNIDAD: {operacionActiva.patente}</span>
-                <span className="text-cyan-600">
+                <span className="text-violet-500">
                   PROD: {operacionActiva.codprod}
                 </span>
               </div>
@@ -193,13 +193,13 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
                               ? infoRubro.nombre
                               : `RUBRO ${r.codigorub}`}
                           </span>
-                          <span className="italic text-cyan-900">
+                          <span className="italic text-violet-500">
                             RANGO: {r.valmin}-{r.valmax}
                           </span>
                         </label>
                         <input
                           type="number"
-                          className="bg-black border border-gray-700 p-2 text-white focus:border-cyan-400 outline-none text-center"
+                          className="bg-black border border-gray-700 p-2 text-white focus:border-violet-500 outline-none text-center"
                           value={valoresCalidad[r.codigorub]}
                           autoFocus={index === 0}
                           onChange={(e) =>
@@ -215,9 +215,10 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
               </div>
 
               <div className="flex flex-col gap-3 mt-4">
+                {/* CORREGIDO: Ahora el texto también es violeta */}
                 <button
                   onClick={procesarCalidad}
-                  className="bg-transparent border border-cyan-600 text-cyan-600 py-3 hover:bg-cyan-400 hover:text-black transition-all font-bold uppercase text-sm"
+                  className="bg-transparent border border-violet-600 text-violet-500 py-3 hover:bg-violet-600 hover:text-black transition-all font-bold uppercase text-sm"
                 >
                   [ GUARDAR ANÁLISIS ]
                 </button>
@@ -231,11 +232,11 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
             </div>
           )}
 
-          {/* MANUAL DE AYUDA */}
+          {/* MANUAL DE AYUDA CORREGIDO */}
           <div className="mt-6 border border-gray-800 rounded-sm overflow-hidden font-mono">
             <button
               onClick={() => setShowManual(!showManual)}
-              className="w-full bg-gray-800/50 p-2 text-[10px] text-cyan-500 flex justify-between items-center hover:bg-gray-800 transition-colors uppercase font-bold italic"
+              className="w-full bg-gray-800/50 p-2 text-[10px] text-violet-500 flex justify-between items-center hover:bg-gray-800 transition-colors uppercase font-bold italic"
             >
               <span>{showManual ? "▼" : "▶"} Manual de Operaciones</span>
             </button>
@@ -263,7 +264,7 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
         </div>
       </div>
 
-      {/* CAPA DE MODAL (SUPERPUESTO) */}
+      {/* CAPA DE MODAL CORREGIDA (VIOLETA EN LUGAR DE CYAN) */}
       {modal.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-auto transition-all duration-300">
           <div
@@ -272,7 +273,7 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
                 ? "border-red-600 shadow-red-900/40"
                 : modal.type === "CONFIRM"
                   ? "border-yellow-600 shadow-yellow-900/40"
-                  : "border-cyan-600 shadow-cyan-900/40"
+                  : "border-violet-600 shadow-violet-900/40"
             }`}
           >
             <h4
@@ -281,7 +282,7 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
                   ? "text-red-500"
                   : modal.type === "CONFIRM"
                     ? "text-yellow-500"
-                    : "text-cyan-500"
+                    : "text-violet-500"
               }`}
             >
               {modal.type === "ERROR"
@@ -301,7 +302,7 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
                 className={`w-full py-3 text-[10px] font-bold uppercase transition-all ${
                   modal.type === "ERROR"
                     ? "bg-red-900/40 border border-red-600 text-red-500"
-                    : "bg-cyan-600 text-black hover:bg-cyan-400"
+                    : "bg-violet-600 text-black hover:bg-violet-400"
                 }`}
               >
                 ACEPTAR

@@ -273,7 +273,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
           <div className="mt-6 border border-gray-800 rounded-sm overflow-hidden font-mono">
             <button
               onClick={() => setShowManual(!showManual)}
-              className="w-full bg-gray-800/50 p-2 text-[10px] text-cyan-500 flex justify-between items-center hover:bg-gray-800 transition-colors uppercase font-bold italic"
+              className="w-full bg-gray-800/50 p-2 text-[10px] text-yellow-500 flex justify-between items-center hover:bg-gray-800 transition-colors uppercase font-bold italic"
             >
               <span>{showManual ? "▼" : "▶"} Manual de Operaciones</span>
             </button>
