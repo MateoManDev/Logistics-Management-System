@@ -40,10 +40,10 @@ const SeccionAyuda = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="mt-6 border border-gray-800 rounded-sm overflow-hidden font-mono">
+    <div className="mt-6 border border-gray-300 dark:border-gray-800 rounded-sm overflow-hidden font-mono">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full bg-gray-800/50 p-2 text-[10px] text-cyan-500 flex justify-between items-center hover:bg-gray-800 transition-colors uppercase font-bold italic"
+        className="w-full bg-gray-200 dark:bg-gray-800/50 p-2 text-[10px] text-cyan-700 dark:text-cyan-500 flex justify-between items-center hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors uppercase font-bold italic"
       >
         <span>{isOpen ? "▼" : "▶"} Manual de Operaciones</span>
         <span className="text-[8px] opacity-50">
@@ -52,19 +52,23 @@ const SeccionAyuda = () => {
       </button>
 
       {isOpen && (
-        <div className="p-3 bg-black/40 text-[9px] text-gray-400 space-y-4 animate-in fade-in duration-300">
+        <div className="p-3 bg-gray-100 dark:bg-black/40 text-[9px] text-gray-600 dark:text-gray-400 space-y-4 animate-in fade-in duration-300">
           <div>
             <p className="text-yellow-600 font-bold mb-1 underline">
               ESTADOS DEL CAMIÓN:
             </p>
             <ul className="space-y-1">
               <li>
-                <span className="text-white font-bold">A:</span> ACTIVO / EN
-                PLAYA - Camión listo para descarga.
+                <span className="text-gray-900 dark:text-white font-bold">
+                  A:
+                </span>{" "}
+                ACTIVO / EN PLAYA - Camión listo para descarga.
               </li>
               <li>
-                <span className="text-white font-bold">B:</span> BLOQUEADO /
-                RECHAZADO - No cumple estándares.
+                <span className="text-gray-900 dark:text-white font-bold">
+                  B:
+                </span>{" "}
+                BLOQUEADO / RECHAZADO - No cumple estándares.
               </li>
             </ul>
           </div>
@@ -91,7 +95,7 @@ const SeccionAyuda = () => {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 pt-2 italic text-gray-500 text-[8px]">
+          <div className="border-t border-gray-300 dark:border-gray-800 pt-2 italic text-gray-500 text-[8px]">
             * Tip: Usa el icono ✎ en la lista para editar rápidamente registros
             existentes.
           </div>
@@ -129,12 +133,14 @@ const PanelGestion = ({
   resetForm,
   onVolver,
 }: any) => (
-  <div className="flex items-center justify-center min-h-screen w-full bg-black p-4 font-mono">
-    <div className="border-2 border-cyan-500 p-8 bg-gray-900 shadow-[0_0_20px_rgba(6,182,212,0.3)] w-full max-w-md">
-      <h3 className="text-cyan-400 font-bold mb-6 text-xl tracking-widest text-center border-b border-cyan-900 pb-2 uppercase italic">
+  // FONDO PRINCIPAL DINÁMICO
+  <div className="flex items-center justify-center min-h-screen w-full bg-gray-100 dark:bg-black p-4 font-mono transition-colors duration-300">
+    {/* CORRECCIÓN: dark:bg-[#0a0a0a] */}
+    <div className="border-2 border-cyan-500 p-8 bg-white dark:bg-[#0a0a0a] shadow-xl dark:shadow-[0_0_20px_rgba(6,182,212,0.3)] w-full max-w-md transition-colors duration-300">
+      <h3 className="text-cyan-600 dark:text-cyan-400 font-bold mb-6 text-xl tracking-widest text-center border-b border-gray-300 dark:border-cyan-900 pb-2 uppercase italic">
         {titulo}{" "}
         {editandoId && (
-          <span className="text-yellow-500 text-[10px] animate-pulse">
+          <span className="text-yellow-600 dark:text-yellow-500 text-[10px] animate-pulse">
             {" "}
             (EDITANDO)
           </span>
@@ -146,13 +152,17 @@ const PanelGestion = ({
         {!isRxP && (
           <>
             <input
-              className="bg-black border border-gray-700 p-2 text-cyan-500 outline-none focus:border-cyan-500 uppercase text-xs"
+              className="bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-2 text-cyan-700 dark:text-cyan-500 outline-none focus:border-cyan-500 uppercase text-xs placeholder-gray-400 dark:placeholder-gray-600"
               placeholder="NOMBRE"
               value={formNombre}
               onChange={(e) => setFormNombre(e.target.value.toUpperCase())}
             />
             <input
-              className={`bg-black border p-2 outline-none uppercase text-xs ${editandoId ? "border-yellow-900 text-yellow-700" : "border-gray-700 text-cyan-500 focus:border-cyan-500"}`}
+              className={`bg-gray-50 dark:bg-black border p-2 outline-none uppercase text-xs placeholder-gray-400 dark:placeholder-gray-600 ${
+                editandoId
+                  ? "border-yellow-500/50 text-yellow-700 dark:text-yellow-700"
+                  : "border-gray-300 dark:border-gray-700 text-cyan-700 dark:text-cyan-500 focus:border-cyan-500"
+              }`}
               placeholder="CÓDIGO"
               value={formCodigo}
               disabled={!!editandoId}
@@ -163,7 +173,7 @@ const PanelGestion = ({
 
         {(isSilo || isRxP) && (
           <select
-            className="bg-black border border-gray-700 p-2 text-yellow-500 text-xs outline-none focus:border-cyan-500"
+            className="bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-2 text-yellow-600 dark:text-yellow-500 text-xs outline-none focus:border-cyan-500"
             value={formAux}
             onChange={(e) => setFormAux(e.target.value)}
           >
@@ -176,11 +186,10 @@ const PanelGestion = ({
           </select>
         )}
 
-        {/* CAMPO DE CAPACIDAD AGREGADO SOLO PARA SILOS */}
         {isSilo && (
           <input
             type="number"
-            className="bg-black border border-gray-700 p-2 text-cyan-500 outline-none focus:border-cyan-500 text-xs"
+            className="bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-2 text-cyan-700 dark:text-cyan-500 outline-none focus:border-cyan-500 text-xs placeholder-gray-400 dark:placeholder-gray-600"
             placeholder="CAPACIDAD MÁXIMA (KG)"
             value={formMin}
             onChange={(e) => setFormMin(e.target.value)}
@@ -190,7 +199,7 @@ const PanelGestion = ({
         {isRxP && (
           <>
             <select
-              className="bg-black border border-gray-700 p-2 text-cyan-500 text-xs outline-none focus:border-cyan-500"
+              className="bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-2 text-cyan-700 dark:text-cyan-500 text-xs outline-none focus:border-cyan-500"
               value={formCodigo}
               onChange={(e) => setFormCodigo(e.target.value)}
             >
@@ -204,14 +213,14 @@ const PanelGestion = ({
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
-                className="bg-black border border-gray-700 p-2 text-white text-[10px] outline-none"
+                className="bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-2 text-gray-900 dark:text-white text-[10px] outline-none placeholder-gray-400 dark:placeholder-gray-600"
                 placeholder="MIN"
                 value={formMin}
                 onChange={(e) => setFormMin(e.target.value)}
               />
               <input
                 type="number"
-                className="bg-black border border-gray-700 p-2 text-white text-[10px] outline-none"
+                className="bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-2 text-gray-900 dark:text-white text-[10px] outline-none placeholder-gray-400 dark:placeholder-gray-600"
                 placeholder="MAX"
                 value={formMax}
                 onChange={(e) => setFormMax(e.target.value)}
@@ -222,14 +231,14 @@ const PanelGestion = ({
 
         <button
           onClick={onConfirmar}
-          className={`mt-2 border py-2 transition-all font-bold uppercase text-xs ${editandoId ? "border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black" : "border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-black"}`}
+          className={`mt-2 border py-2 transition-all font-bold uppercase text-xs ${editandoId ? "border-yellow-500 text-yellow-600 dark:text-yellow-500 hover:bg-yellow-500 hover:text-white dark:hover:text-black" : "border-cyan-500 text-cyan-600 dark:text-cyan-500 hover:bg-cyan-500 hover:text-white dark:hover:text-black"}`}
         >
           {editandoId ? "[ GUARDAR CAMBIOS ]" : "[ + AÑADIR REGISTRO ]"}
         </button>
         {editandoId && (
           <button
             onClick={resetForm}
-            className="text-[10px] text-gray-600 hover:text-white uppercase tracking-tighter"
+            className="text-[10px] text-gray-500 dark:text-gray-600 hover:text-red-500 dark:hover:text-white uppercase tracking-tighter"
           >
             ✕ CANCELAR EDICIÓN
           </button>
@@ -237,19 +246,19 @@ const PanelGestion = ({
       </div>
 
       {/* LISTADO */}
-      <div className="space-y-1 max-h-40 overflow-y-auto border-t border-gray-800 pt-4 mb-2">
+      <div className="space-y-1 max-h-40 overflow-y-auto border-t border-gray-300 dark:border-gray-800 pt-4 mb-2 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-700">
         {lista.map((item: any, idx: number) => (
           <div
             key={idx}
-            className="flex justify-between items-center py-2 border-b border-gray-800 group hover:bg-white/5 px-1"
+            className="flex justify-between items-center py-2 border-b border-gray-200 dark:border-gray-800 group hover:bg-gray-100 dark:hover:bg-white/5 px-1"
           >
             <div className="flex flex-col text-[10px]">
-              <span className="text-white uppercase">
+              <span className="text-gray-900 dark:text-white uppercase">
                 {isRxP
                   ? `${item.codigoprod} ➔ ${item.codigorub}`
                   : item[keyNombre]}
               </span>
-              <span className="text-cyan-700 font-bold">
+              <span className="text-cyan-700 dark:text-cyan-500 font-bold">
                 {isRxP
                   ? `MIN: ${item.valmin} | MAX: ${item.valmax}`
                   : isSilo
@@ -260,7 +269,7 @@ const PanelGestion = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => onSeleccionarEdit(item)}
-                className="text-gray-600 hover:text-yellow-500 p-1 text-xs transition-colors"
+                className="text-gray-500 dark:text-gray-600 hover:text-yellow-500 p-1 text-xs transition-colors"
               >
                 ✎
               </button>
@@ -272,7 +281,7 @@ const PanelGestion = ({
                       : item[keyId],
                   )
                 }
-                className="text-red-900 hover:text-red-500 font-bold p-1 text-xs"
+                className="text-red-700 dark:text-red-900 hover:text-red-500 font-bold p-1 text-xs"
               >
                 ✕
               </button>
@@ -284,19 +293,19 @@ const PanelGestion = ({
       {/* MANUAL DESPLEGABLE */}
       <SeccionAyuda />
 
-      <div className="mt-6 border-t border-gray-800 pt-4">
+      <div className="mt-6 border-t border-gray-300 dark:border-gray-800 pt-4">
         <button
           onClick={() => {
             setSubVista("PRINCIPAL");
             resetForm();
           }}
-          className="w-full text-cyan-700 text-[10px] uppercase text-center py-1 hover:text-cyan-400"
+          className="w-full text-cyan-700 dark:text-cyan-500 text-[10px] uppercase text-center py-1 hover:text-cyan-900 dark:hover:text-cyan-400"
         >
           ▲ VOLVER A ADMINISTRACIÓN
         </button>
         <button
           onClick={onVolver}
-          className="w-full text-red-700 text-[10px] font-bold text-center mt-2 uppercase hover:text-red-500"
+          className="w-full text-red-700 dark:text-red-700 text-[10px] font-bold text-center mt-2 uppercase hover:text-red-500"
         >
           &lt;&lt; Volver al Menú Principal
         </button>
@@ -598,23 +607,24 @@ export const AdminMenu = ({ onVolver }: { onVolver: () => void }) => {
       );
 
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-black gap-4 font-mono">
-        <div className="border-2 border-white p-10 bg-gray-900 flex flex-col gap-3 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
-          <h2 className="text-white text-center mb-6 tracking-widest font-bold border-b border-white pb-2 uppercase italic">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 dark:bg-black gap-4 font-mono transition-colors duration-300">
+        {/* CORRECCIÓN: dark:bg-[#0a0a0a] */}
+        <div className="border-2 border-gray-300 dark:border-white p-10 bg-white dark:bg-[#0a0a0a] flex flex-col gap-3 shadow-lg dark:shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+          <h2 className="text-gray-900 dark:text-white text-center mb-6 tracking-widest font-bold border-b border-gray-300 dark:border-white pb-2 uppercase italic">
             Admin Panel
           </h2>
           {["PRODUCTOS", "RUBROS", "RXP", "SILOS"].map((v) => (
             <button
               key={v}
               onClick={() => setSubVista(v as SubVista)}
-              className="border border-cyan-500 p-3 w-64 text-cyan-500 hover:bg-cyan-500 hover:text-black uppercase font-bold text-sm transition-all"
+              className="border border-cyan-500 p-3 w-64 text-cyan-600 dark:text-cyan-500 hover:bg-cyan-500 hover:text-white dark:hover:text-black uppercase font-bold text-sm transition-all"
             >
               {v.replace("RXP", "Rubros x Producto")}
             </button>
           ))}
           <button
             onClick={onVolver}
-            className="border border-red-500 p-3 w-64 text-red-500 hover:bg-red-500 hover:text-white uppercase font-bold text-sm mt-4 italic transition-all"
+            className="border border-red-500 p-3 w-64 text-red-600 dark:text-red-500 dark:hover:text-black hover:bg-red-500 hover:text-white uppercase font-bold text-sm mt-4 italic transition-all"
           >
             Regresar
           </button>
@@ -624,7 +634,7 @@ export const AdminMenu = ({ onVolver }: { onVolver: () => void }) => {
   };
 
   return (
-    <div className="relative min-h-screen bg-black font-mono">
+    <div className="relative min-h-screen bg-gray-100 dark:bg-black font-mono transition-colors duration-300">
       {/* CAPA DE FONDO: MENÚS Y CONTENIDO */}
       {/* Si el modal está abierto, aplicamos desenfoque y desactivamos clics */}
       <div
@@ -636,22 +646,23 @@ export const AdminMenu = ({ onVolver }: { onVolver: () => void }) => {
       {/* CAPA SUPERIOR: EL CARTEL (MODAL) */}
       {modal.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm">
+          {/* CORRECCIÓN: dark:bg-[#0a0a0a] */}
           <div
-            className={`w-full max-w-sm border-2 p-6 bg-gray-900 shadow-2xl animate-in zoom-in duration-200 ${
+            className={`w-full max-w-sm border-2 p-6 bg-white dark:bg-[#0a0a0a] shadow-2xl animate-in zoom-in duration-200 ${
               modal.type === "ERROR"
-                ? "border-red-600 shadow-red-900/40"
+                ? "border-red-600 shadow-red-500/40"
                 : modal.type === "CONFIRM"
-                  ? "border-yellow-600 shadow-yellow-900/40"
-                  : "border-emerald-600 shadow-emerald-900/40"
+                  ? "border-yellow-500 shadow-yellow-500/40"
+                  : "border-emerald-600 shadow-emerald-500/40"
             }`}
           >
             <h4
               className={`text-center font-bold mb-4 tracking-widest uppercase text-xs ${
                 modal.type === "ERROR"
-                  ? "text-red-500"
+                  ? "text-red-600 dark:text-red-500"
                   : modal.type === "CONFIRM"
-                    ? "text-yellow-500"
-                    : "text-emerald-500"
+                    ? "text-yellow-600 dark:text-yellow-500"
+                    : "text-emerald-600 dark:text-emerald-500"
               }`}
             >
               {modal.type === "ERROR"
@@ -661,7 +672,7 @@ export const AdminMenu = ({ onVolver }: { onVolver: () => void }) => {
                   : "[ i ] SISTEMA"}
             </h4>
 
-            <p className="text-white text-center text-[11px] mb-6 font-mono uppercase italic leading-tight">
+            <p className="text-gray-900 dark:text-white text-center text-[11px] mb-6 font-mono uppercase italic leading-tight">
               {modal.message}
             </p>
 
@@ -669,7 +680,7 @@ export const AdminMenu = ({ onVolver }: { onVolver: () => void }) => {
               {modal.type === "CONFIRM" && (
                 <button
                   onClick={closeModal}
-                  className="flex-1 border border-gray-700 text-gray-500 py-3 text-[10px] uppercase font-bold hover:text-white transition-colors"
+                  className="flex-1 border border-gray-300 dark:border-gray-700 text-gray-500 py-3 text-[10px] uppercase font-bold hover:bg-gray-100 dark:hover:text-white transition-colors"
                 >
                   Cancelar
                 </button>
@@ -679,10 +690,10 @@ export const AdminMenu = ({ onVolver }: { onVolver: () => void }) => {
                 onClick={modal.onConfirm || closeModal}
                 className={`flex-1 py-3 text-[10px] font-bold uppercase transition-all ${
                   modal.type === "ERROR"
-                    ? "bg-red-900/40 border border-red-600 text-red-500"
+                    ? "bg-red-100 dark:bg-red-900/40 border border-red-500 text-red-700 dark:text-red-500"
                     : modal.type === "CONFIRM"
-                      ? "bg-yellow-600 text-black hover:bg-yellow-500"
-                      : "bg-emerald-600 text-black hover:bg-emerald-400"
+                      ? "bg-yellow-500 text-white dark:text-black hover:bg-yellow-600 dark:hover:bg-yellow-500"
+                      : "bg-emerald-600 text-white dark:text-black hover:bg-emerald-500 dark:hover:bg-emerald-400"
                 }`}
               >
                 ACEPTAR

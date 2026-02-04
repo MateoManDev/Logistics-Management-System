@@ -126,19 +126,20 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
   };
 
   return (
-    <div className="relative min-h-screen bg-black font-mono">
+    <div className="relative min-h-screen bg-gray-100 dark:bg-black font-mono transition-colors duration-300">
       {/* CAPA DE FONDO: INTERFAZ DE CALIDAD */}
       <div
-        className={`flex items-center justify-center min-h-screen w-full bg-black p-4 transition-all duration-300 ${modal.isOpen ? "opacity-60 blur-[2px] pointer-events-none scale-[0.99]" : "opacity-100 blur-0 scale-100"}`}
+        className={`flex items-center justify-center min-h-screen w-full bg-gray-100 dark:bg-black p-4 transition-all duration-300 ${modal.isOpen ? "opacity-60 blur-[2px] pointer-events-none scale-[0.99]" : "opacity-100 blur-0 scale-100"}`}
       >
-        <div className="border-2 border-violet-600 p-8 bg-gray-900 shadow-[0_0_20px_rgba(139,92,246,0.2)] w-full max-w-md">
-          <h2 className="text-center mb-8 text-xl font-bold tracking-[0.2em] text-violet-500 border-b-2 border-violet-900 pb-4 uppercase italic">
+        {/* CORRECCIÓN: dark:bg-[#0a0a0a] */}
+        <div className="border-2 border-violet-600 dark:border-violet-600 p-8 bg-white dark:bg-[#0a0a0a] shadow-xl dark:shadow-[0_0_20px_rgba(139,92,246,0.2)] w-full max-w-md transition-colors duration-300">
+          <h2 className="text-center mb-8 text-xl font-bold tracking-[0.2em] text-violet-600 dark:text-violet-500 border-b-2 border-violet-600 dark:border-violet-900 pb-4 uppercase italic">
             [ Registrar Calidad ]
           </h2>
 
           {!operacionActiva ? (
             <div className="flex flex-col gap-4">
-              <label className="text-[10px] text-violet-500 uppercase tracking-widest font-bold">
+              <label className="text-[10px] text-violet-700 dark:text-violet-500 uppercase tracking-widest font-bold">
                 Unidades en Playa esperando Calada:
               </label>
               <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
@@ -147,23 +148,23 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
                     <button
                       key={op.patente}
                       onClick={() => seleccionarCamion(op)}
-                      className="flex justify-between items-center p-3 border border-gray-800 bg-black hover:border-violet-500 transition-all group text-left"
+                      className="flex justify-between items-center p-3 border border-gray-300 dark:border-gray-800 bg-gray-50 dark:bg-black hover:border-violet-500 dark:hover:border-violet-500 transition-all group text-left"
                     >
                       <div className="flex flex-col">
-                        <span className="text-white font-bold">
+                        <span className="text-gray-900 dark:text-white font-bold">
                           {op.patente}
                         </span>
                         <span className="text-[9px] text-gray-500 uppercase">
                           {op.codprod}
                         </span>
                       </div>
-                      <span className="text-[9px] font-bold text-violet-500 border border-violet-900 px-2 py-1 uppercase group-hover:bg-violet-900 group-hover:text-black transition-colors">
+                      <span className="text-[9px] font-bold text-violet-600 dark:text-violet-500 border border-violet-200 dark:border-violet-900 px-2 py-1 uppercase group-hover:bg-violet-500 group-hover:text-white dark:group-hover:bg-violet-900 dark:group-hover:text-black transition-colors">
                         Analizar
                       </span>
                     </button>
                   ))
                 ) : (
-                  <div className="text-center py-8 border border-dashed border-gray-800 text-gray-700 text-xs italic">
+                  <div className="text-center py-8 border border-dashed border-gray-300 dark:border-gray-800 text-gray-500 dark:text-gray-700 text-xs italic">
                     NO HAY CAMIONES ARRIBADOS PENDIENTES
                   </div>
                 )}
@@ -171,9 +172,9 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
             </div>
           ) : (
             <div className="flex flex-col gap-5 animate-in slide-in-from-bottom duration-300">
-              <div className="text-white text-[10px] border-b border-gray-800 pb-2 flex justify-between uppercase font-bold">
+              <div className="text-gray-900 dark:text-white text-[10px] border-b border-gray-300 dark:border-gray-800 pb-2 flex justify-between uppercase font-bold">
                 <span>UNIDAD: {operacionActiva.patente}</span>
-                <span className="text-violet-500">
+                <span className="text-violet-600 dark:text-violet-500">
                   PROD: {operacionActiva.codprod}
                 </span>
               </div>
@@ -193,13 +194,13 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
                               ? infoRubro.nombre
                               : `RUBRO ${r.codigorub}`}
                           </span>
-                          <span className="italic text-violet-500">
+                          <span className="italic text-violet-600 dark:text-violet-500">
                             RANGO: {r.valmin}-{r.valmax}
                           </span>
                         </label>
                         <input
                           type="number"
-                          className="bg-black border border-gray-700 p-2 text-white focus:border-violet-500 outline-none text-center"
+                          className="bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-2 text-gray-900 dark:text-white focus:border-violet-500 outline-none text-center"
                           value={valoresCalidad[r.codigorub]}
                           autoFocus={index === 0}
                           onChange={(e) =>
@@ -215,16 +216,15 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
               </div>
 
               <div className="flex flex-col gap-3 mt-4">
-                {/* CORREGIDO: Ahora el texto también es violeta */}
                 <button
                   onClick={procesarCalidad}
-                  className="bg-transparent border border-violet-600 text-violet-500 py-3 hover:bg-violet-600 hover:text-black transition-all font-bold uppercase text-sm"
+                  className="bg-transparent border border-violet-600 text-violet-600 dark:text-violet-500 py-3 hover:bg-violet-600 hover:text-white dark:hover:text-black transition-all font-bold uppercase text-sm"
                 >
                   [ GUARDAR ANÁLISIS ]
                 </button>
                 <button
                   onClick={() => setOperacionActiva(null)}
-                  className="text-gray-500 text-[10px] hover:text-white uppercase text-center italic"
+                  className="text-gray-500 text-[10px] hover:text-black dark:hover:text-white uppercase text-center italic"
                 >
                   Cancelar Carga
                 </button>
@@ -233,23 +233,26 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
           )}
 
           {/* MANUAL DE AYUDA CORREGIDO */}
-          <div className="mt-6 border border-gray-800 rounded-sm overflow-hidden font-mono">
+          <div className="mt-6 border border-gray-300 dark:border-gray-800 rounded-sm overflow-hidden font-mono">
             <button
               onClick={() => setShowManual(!showManual)}
-              className="w-full bg-gray-800/50 p-2 text-[10px] text-violet-500 flex justify-between items-center hover:bg-gray-800 transition-colors uppercase font-bold italic"
+              className="w-full bg-gray-200 dark:bg-gray-800/50 p-2 text-[10px] text-violet-700 dark:text-violet-500 flex justify-between items-center hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors uppercase font-bold italic"
             >
               <span>{showManual ? "▼" : "▶"} Manual de Operaciones</span>
             </button>
             {showManual && (
-              <div className="p-3 bg-black/40 border border-gray-800 text-[9px] text-gray-400 space-y-3">
+              <div className="p-3 bg-gray-100 dark:bg-black/40 border border-gray-300 dark:border-gray-800 text-[9px] text-gray-600 dark:text-gray-400 space-y-3">
                 <p>
                   • Los camiones aparecen aquí tras marcar el **Arribo** en
                   Recepción.
                 </p>
                 <p>
                   • Al completar el análisis, el camión pasa a estado{" "}
-                  <b className="text-white">C (Calado)</b> o{" "}
-                  <b className="text-red-500">R (Rechazado)</b>.
+                  <b className="text-gray-900 dark:text-white">C (Calado)</b> o{" "}
+                  <b className="text-red-600 dark:text-red-500">
+                    R (Rechazado)
+                  </b>
+                  .
                 </p>
               </div>
             )}
@@ -257,32 +260,33 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
 
           <button
             onClick={onVolver}
-            className="w-full text-red-700 text-[10px] font-bold border-t border-gray-800 pt-4 text-center mt-6 uppercase hover:text-red-500 transition-all"
+            className="w-full text-red-600 dark:text-red-700 text-[10px] font-bold border-t border-gray-300 dark:border-gray-800 pt-4 text-center mt-6 uppercase hover:text-red-500 transition-all"
           >
             &lt;&lt; Volver al Menú Principal
           </button>
         </div>
       </div>
 
-      {/* CAPA DE MODAL CORREGIDA (VIOLETA EN LUGAR DE CYAN) */}
+      {/* CAPA DE MODAL CORREGIDA */}
       {modal.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-auto transition-all duration-300">
+          {/* CORRECCIÓN: dark:bg-[#0a0a0a] */}
           <div
-            className={`w-full max-w-sm border-2 p-6 bg-gray-900 shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in duration-200 ${
+            className={`w-full max-w-sm border-2 p-6 bg-white dark:bg-[#0a0a0a] shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in duration-200 ${
               modal.type === "ERROR"
-                ? "border-red-600 shadow-red-900/40"
+                ? "border-red-600 shadow-red-500/40 dark:shadow-red-900/40"
                 : modal.type === "CONFIRM"
-                  ? "border-yellow-600 shadow-yellow-900/40"
-                  : "border-violet-600 shadow-violet-900/40"
+                  ? "border-yellow-500 dark:border-yellow-600 shadow-yellow-500/40 dark:shadow-yellow-900/40"
+                  : "border-violet-600 shadow-violet-500/40 dark:shadow-violet-900/40"
             }`}
           >
             <h4
               className={`text-center font-bold mb-4 tracking-widest uppercase text-[10px] ${
                 modal.type === "ERROR"
-                  ? "text-red-500"
+                  ? "text-red-600 dark:text-red-500"
                   : modal.type === "CONFIRM"
-                    ? "text-yellow-500"
-                    : "text-violet-500"
+                    ? "text-yellow-600 dark:text-yellow-500"
+                    : "text-violet-600 dark:text-violet-500"
               }`}
             >
               {modal.type === "ERROR"
@@ -292,17 +296,26 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
                   : "[ i ] RESULTADO"}
             </h4>
 
-            <p className="text-white text-center text-[11px] mb-6 font-mono uppercase italic leading-tight">
+            <p className="text-gray-900 dark:text-white text-center text-[11px] mb-6 font-mono uppercase italic leading-tight">
               {modal.message}
             </p>
 
             <div className="flex gap-2">
+              {modal.type === "CONFIRM" && (
+                <button
+                  onClick={closeModal}
+                  className="flex-1 border border-gray-300 dark:border-gray-700 text-gray-500 py-3 text-[10px] uppercase font-bold hover:bg-gray-100 dark:hover:text-white transition-colors"
+                >
+                  Cancelar
+                </button>
+              )}
+
               <button
                 onClick={modal.onConfirm || closeModal}
                 className={`w-full py-3 text-[10px] font-bold uppercase transition-all ${
                   modal.type === "ERROR"
-                    ? "bg-red-900/40 border border-red-600 text-red-500"
-                    : "bg-violet-600 text-black hover:bg-violet-400"
+                    ? "bg-red-100 dark:bg-red-900/40 border border-red-500 dark:border-red-600 text-red-700 dark:text-red-500"
+                    : "bg-violet-600 text-white dark:text-black hover:bg-violet-500 dark:hover:bg-violet-400"
                 }`}
               >
                 ACEPTAR

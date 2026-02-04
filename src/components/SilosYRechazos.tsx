@@ -127,20 +127,21 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
   };
 
   return (
-    <div className="relative min-h-screen bg-black font-mono">
+    <div className="relative min-h-screen bg-gray-100 dark:bg-black font-mono transition-colors duration-300">
       {/* CAPA DE FONDO: CONTENIDO PRINCIPAL */}
       <div
-        className={`flex items-center justify-center min-h-screen w-full bg-black p-4 transition-all duration-300 ${modal.isOpen || siloAjuste ? "opacity-60 blur-[2px] pointer-events-none scale-[0.99]" : "opacity-100 blur-0 scale-100"}`}
+        className={`flex items-center justify-center min-h-screen w-full bg-gray-100 dark:bg-black p-4 transition-all duration-300 ${modal.isOpen || siloAjuste ? "opacity-60 blur-[2px] pointer-events-none scale-[0.99]" : "opacity-100 blur-0 scale-100"}`}
       >
-        <div className="border-2 border-yellow-600 p-8 bg-gray-900 shadow-[0_0_20px_rgba(234,179,8,0.2)] w-full max-w-2xl">
-          <h2 className="text-center mb-8 text-xl font-bold tracking-[0.2em] text-yellow-500 border-b-2 border-yellow-900 pb-4 uppercase italic">
+        {/* CORRECCIÓN: dark:bg-[#0a0a0a] en lugar de gray-900 para evitar el tono azul */}
+        <div className="border-2 border-yellow-500 dark:border-yellow-600 p-8 bg-white dark:bg-[#0a0a0a] shadow-xl dark:shadow-[0_0_20px_rgba(234,179,8,0.2)] w-full max-w-2xl transition-colors duration-300">
+          <h2 className="text-center mb-8 text-xl font-bold tracking-[0.2em] text-yellow-600 dark:text-yellow-500 border-b-2 border-yellow-600 dark:border-yellow-900 pb-4 uppercase italic">
             [ Gestión y Monitoreo ]
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* COLUMNA IZQUIERDA: SILOS INTERACTIVOS */}
             <div>
-              <p className="text-[10px] text-yellow-700 uppercase tracking-widest mb-4 font-bold border-b border-yellow-900/30 pb-1">
+              <p className="text-[10px] text-yellow-800 dark:text-yellow-700 uppercase tracking-widest mb-4 font-bold border-b border-yellow-200 dark:border-yellow-900/30 pb-1">
                 ➤ Stock en Planta
               </p>
               <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
@@ -154,20 +155,20 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                     return (
                       <div
                         key={silo.codsil}
-                        className="bg-black/40 p-3 border border-gray-800 hover:border-yellow-900 transition-all group relative"
+                        className="bg-gray-50 dark:bg-black/40 p-3 border border-gray-300 dark:border-gray-800 hover:border-yellow-600 dark:hover:border-yellow-900 transition-all group relative"
                       >
                         <div className="flex justify-between items-center mb-2">
                           <div className="flex flex-col">
-                            <span className="text-white text-[11px] font-bold uppercase">
+                            <span className="text-gray-900 dark:text-white text-[11px] font-bold uppercase">
                               {silo.nombre}
                             </span>
-                            <span className="text-cyan-600 text-[8px] font-bold italic uppercase">
+                            <span className="text-cyan-700 dark:text-cyan-600 text-[8px] font-bold italic uppercase">
                               {obtenerNombreProducto(silo.codprod)}
                             </span>
                           </div>
                           <div className="text-right">
                             <span
-                              className={`text-[10px] font-bold ${porcentaje > 90 ? "text-red-500 animate-pulse" : "text-gray-400"}`}
+                              className={`text-[10px] font-bold ${porcentaje > 90 ? "text-red-600 dark:text-red-500 animate-pulse" : "text-gray-500 dark:text-gray-400"}`}
                             >
                               {porcentaje.toFixed(1)}%
                             </span>
@@ -175,23 +176,23 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                         </div>
 
                         {/* Barra de Stock */}
-                        <div className="w-full bg-gray-950 h-2 rounded-full overflow-hidden border border-gray-800 mb-2">
+                        <div className="w-full bg-gray-200 dark:bg-gray-950 h-2 rounded-full overflow-hidden border border-gray-300 dark:border-gray-800 mb-2">
                           <div
                             className={`h-full transition-all duration-1000 ${
                               porcentaje > 90
-                                ? "bg-red-600 shadow-[0_0_10px_rgba(220,38,38,0.5)]"
-                                : "bg-yellow-600"
+                                ? "bg-red-600 dark:shadow-[0_0_10px_rgba(220,38,38,0.5)]"
+                                : "bg-yellow-500 dark:bg-yellow-600"
                             }`}
                             style={{ width: `${porcentaje}%` }}
                           ></div>
                         </div>
 
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-[8px] text-gray-600 uppercase font-bold tracking-tighter">
+                          <span className="text-[8px] text-gray-600 dark:text-gray-600 uppercase font-bold tracking-tighter">
                             Libre:{" "}
                             {(silo.capacidad - silo.stock).toLocaleString()} KG
                           </span>
-                          <span className="text-[9px] text-gray-500 font-bold">
+                          <span className="text-[9px] text-gray-700 dark:text-gray-500 font-bold">
                             {silo.stock.toLocaleString()} /{" "}
                             {silo.capacidad.toLocaleString()}
                           </span>
@@ -200,7 +201,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                         {/* BOTÓN DE ACCIÓN (NUEVO) */}
                         <button
                           onClick={() => abrirPanelSalida(silo)}
-                          className="w-full text-[9px] border border-yellow-900/50 text-yellow-700 hover:bg-yellow-900 hover:text-white uppercase py-1 transition-colors font-bold pointer-events-auto"
+                          className="w-full text-[9px] border border-yellow-600/50 dark:border-yellow-900/50 text-yellow-800 dark:text-yellow-700 hover:bg-yellow-500 dark:hover:bg-yellow-900 hover:text-white uppercase py-1 transition-colors font-bold pointer-events-auto"
                         >
                           Registrar Salida / Venta
                         </button>
@@ -208,7 +209,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                     );
                   })
                 ) : (
-                  <p className="text-gray-700 text-[10px] italic">
+                  <p className="text-gray-500 dark:text-gray-700 text-[10px] italic">
                     No hay silos configurados en administración.
                   </p>
                 )}
@@ -217,7 +218,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
 
             {/* COLUMNA DERECHA: RECHAZOS (Sin cambios funcionales) */}
             <div className="flex flex-col">
-              <p className="text-[10px] text-red-700 uppercase tracking-widest mb-4 font-bold border-b border-red-900/30 pb-1">
+              <p className="text-[10px] text-red-700 dark:text-red-700 uppercase tracking-widest mb-4 font-bold border-b border-red-200 dark:border-red-900/30 pb-1">
                 ➤ Historial de Rechazos
               </p>
 
@@ -226,43 +227,43 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                 onChange={(date) => setSelectedDate(date)}
                 locale="es"
                 dateFormat="dd/MM/yyyy"
-                className="w-full bg-black border border-gray-700 p-2 text-white text-xs mb-4 outline-none focus:border-yellow-500"
+                className="w-full bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-2 text-gray-900 dark:text-white text-xs mb-4 outline-none focus:border-yellow-500"
               />
 
-              <div className="flex-1 min-h-[150px] max-h-[220px] overflow-y-auto bg-black/60 border border-gray-800 p-3 custom-scrollbar">
+              <div className="flex-1 min-h-[150px] max-h-[220px] overflow-y-auto bg-gray-50 dark:bg-black/60 border border-gray-300 dark:border-gray-800 p-3 custom-scrollbar">
                 {camionesRechazados.length > 0 ? (
                   camionesRechazados.map((op, idx) => (
                     <div
                       key={idx}
-                      className="flex flex-col mb-3 pb-2 border-b border-gray-900 last:border-0"
+                      className="flex flex-col mb-3 pb-2 border-b border-gray-200 dark:border-gray-900 last:border-0"
                     >
                       <div className="flex justify-between items-center">
-                        <span className="text-red-500 font-bold text-xs tracking-widest">
+                        <span className="text-red-600 dark:text-red-500 font-bold text-xs tracking-widest">
                           {op.patente}
                         </span>
                         <span className="text-[9px] text-gray-500 italic">
                           {obtenerNombreProducto(op.codprod)}
                         </span>
                       </div>
-                      <span className="text-[8px] text-red-900 uppercase font-bold mt-0.5">
+                      <span className="text-[8px] text-red-800 dark:text-red-900 uppercase font-bold mt-0.5">
                         Motivo: Fallo en parámetros de calidad
                       </span>
                     </div>
                   ))
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center opacity-30 italic">
-                    <p className="text-gray-500 text-[9px] uppercase">
+                    <p className="text-gray-400 dark:text-gray-500 text-[9px] uppercase">
                       Sin rechazos registrados
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="mt-4 p-3 bg-red-900/10 border border-red-900/40 text-center">
+              <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/10 border border-red-200 dark:border-red-900/40 text-center">
                 <span className="text-[10px] text-red-700 uppercase font-bold">
                   Total del día:{" "}
                 </span>
-                <span className="text-white font-bold ml-2">
+                <span className="text-gray-900 dark:text-white font-bold ml-2">
                   {camionesRechazados.length} Unidades
                 </span>
               </div>
@@ -270,15 +271,15 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
           </div>
 
           {/* MANUAL DESPLEGABLE */}
-          <div className="mt-6 border border-gray-800 rounded-sm overflow-hidden font-mono">
+          <div className="mt-6 border border-gray-300 dark:border-gray-800 rounded-sm overflow-hidden font-mono">
             <button
               onClick={() => setShowManual(!showManual)}
-              className="w-full bg-gray-800/50 p-2 text-[10px] text-yellow-500 flex justify-between items-center hover:bg-gray-800 transition-colors uppercase font-bold italic"
+              className="w-full bg-gray-200 dark:bg-gray-800/50 p-2 text-[10px] text-yellow-700 dark:text-yellow-500 flex justify-between items-center hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors uppercase font-bold italic"
             >
               <span>{showManual ? "▼" : "▶"} Manual de Operaciones</span>
             </button>
             {showManual && (
-              <div className="p-3 bg-black/30 border border-gray-800 text-[9px] text-gray-500 space-y-2 italic">
+              <div className="p-3 bg-gray-100 dark:bg-black/30 border border-gray-300 dark:border-gray-800 text-[9px] text-gray-600 dark:text-gray-500 space-y-2 italic">
                 <p>
                   • Use "REGISTRAR SALIDA" para descontar stock (ventas,
                   traslados).
@@ -291,7 +292,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
 
           <button
             onClick={onVolver}
-            className="w-full text-red-700 text-[10px] font-bold border-t border-gray-800 pt-4 text-center mt-6 uppercase hover:text-red-500 transition-all"
+            className="w-full text-red-700 text-[10px] font-bold border-t border-gray-300 dark:border-gray-800 pt-4 text-center mt-6 uppercase hover:text-red-500 transition-all"
           >
             &lt;&lt; Volver al Menú Principal
           </button>
@@ -300,13 +301,14 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
 
       {/* --- PANEL FLOTANTE: REGISTRO DE SALIDA (CAPA INTERMEDIA) --- */}
       {siloAjuste && !modal.isOpen && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80 backdrop-blur-sm pointer-events-auto">
-          <div className="w-full max-w-sm border-2 border-yellow-600 bg-gray-900 p-6 shadow-2xl animate-in zoom-in duration-200">
-            <div className="text-center border-b border-yellow-900/50 pb-4 mb-4">
-              <h3 className="text-yellow-500 font-bold uppercase tracking-widest text-sm">
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-auto">
+          {/* CORRECCIÓN: dark:bg-[#0a0a0a] aquí también */}
+          <div className="w-full max-w-sm border-2 border-yellow-500 dark:border-yellow-600 bg-white dark:bg-[#0a0a0a] p-6 shadow-2xl animate-in zoom-in duration-200">
+            <div className="text-center border-b border-yellow-200 dark:border-yellow-900/50 pb-4 mb-4">
+              <h3 className="text-yellow-600 dark:text-yellow-500 font-bold uppercase tracking-widest text-sm">
                 Registro de Salida
               </h3>
-              <p className="text-white font-bold text-xs mt-1">
+              <p className="text-gray-900 dark:text-white font-bold text-xs mt-1">
                 {siloAjuste.nombre}
               </p>
               <p className="text-[9px] text-gray-500 italic uppercase">
@@ -315,18 +317,18 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
             </div>
 
             <div className="flex flex-col gap-2 mb-6">
-              <label className="text-[9px] text-gray-400 uppercase font-bold">
+              <label className="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-bold">
                 Kilos a descontar:
               </label>
               <input
                 type="number"
                 autoFocus
-                className="bg-black border border-gray-700 p-3 text-white text-center focus:border-yellow-500 outline-none text-lg"
+                className="bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-3 text-gray-900 dark:text-white text-center focus:border-yellow-500 outline-none text-lg"
                 placeholder="0"
                 value={cantidadSalida}
                 onChange={(e) => setCantidadSalida(e.target.value)}
               />
-              <p className="text-[9px] text-right text-gray-600">
+              <p className="text-[9px] text-right text-gray-500 dark:text-gray-600">
                 Stock actual: {siloAjuste.stock} KG
               </p>
             </div>
@@ -334,13 +336,13 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
             <div className="flex gap-2">
               <button
                 onClick={() => setSiloAjuste(null)}
-                className="flex-1 border border-gray-700 text-gray-500 py-2 text-[10px] uppercase font-bold hover:text-white transition-colors"
+                className="flex-1 border border-gray-300 dark:border-gray-700 text-gray-500 py-2 text-[10px] uppercase font-bold hover:bg-gray-100 dark:hover:text-white transition-colors"
               >
                 Cancelar
               </button>
               <button
                 onClick={confirmarSalida}
-                className="flex-1 bg-yellow-600 text-black py-2 text-[10px] uppercase font-bold hover:bg-yellow-500 transition-colors"
+                className="flex-1 bg-yellow-500 dark:bg-yellow-600 text-white dark:text-black py-2 text-[10px] uppercase font-bold hover:bg-yellow-600 dark:hover:bg-yellow-500 transition-colors"
               >
                 Procesar
               </button>
@@ -352,22 +354,23 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
       {/* --- MODAL DEL SISTEMA (CAPA SUPERIOR) --- */}
       {modal.isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm pointer-events-auto transition-all duration-300">
+          {/* CORRECCIÓN: dark:bg-[#0a0a0a] aquí también */}
           <div
-            className={`w-full max-w-sm border-2 p-6 bg-gray-900 shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in duration-200 ${
+            className={`w-full max-w-sm border-2 p-6 bg-white dark:bg-[#0a0a0a] shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in duration-200 ${
               modal.type === "ERROR"
-                ? "border-red-600 shadow-red-900/40"
+                ? "border-red-600 shadow-red-500/40 dark:shadow-red-900/40"
                 : modal.type === "CONFIRM"
-                  ? "border-yellow-600 shadow-yellow-900/40"
-                  : "border-emerald-600 shadow-emerald-900/40"
+                  ? "border-yellow-500 dark:border-yellow-600 shadow-yellow-500/40 dark:shadow-yellow-900/40"
+                  : "border-emerald-600 shadow-emerald-500/40 dark:shadow-emerald-900/40"
             }`}
           >
             <h4
               className={`text-center font-bold mb-4 tracking-widest uppercase text-[10px] ${
                 modal.type === "ERROR"
-                  ? "text-red-500"
+                  ? "text-red-600 dark:text-red-500"
                   : modal.type === "CONFIRM"
-                    ? "text-yellow-500"
-                    : "text-emerald-500"
+                    ? "text-yellow-600 dark:text-yellow-500"
+                    : "text-emerald-600 dark:text-emerald-500"
               }`}
             >
               {modal.type === "ERROR"
@@ -377,7 +380,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                   : "[ i ] SISTEMA"}
             </h4>
 
-            <p className="text-white text-center text-[11px] mb-6 font-mono uppercase italic leading-tight">
+            <p className="text-gray-900 dark:text-white text-center text-[11px] mb-6 font-mono uppercase italic leading-tight">
               {modal.message}
             </p>
 
@@ -385,7 +388,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
               {modal.type === "CONFIRM" && (
                 <button
                   onClick={closeModal}
-                  className="flex-1 border border-gray-700 text-gray-500 py-3 text-[10px] uppercase font-bold hover:text-white transition-colors"
+                  className="flex-1 border border-gray-300 dark:border-gray-700 text-gray-500 py-3 text-[10px] uppercase font-bold hover:bg-gray-100 dark:hover:text-white transition-colors"
                 >
                   Cancelar
                 </button>
@@ -395,10 +398,10 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                 onClick={modal.onConfirm || closeModal}
                 className={`flex-1 py-3 text-[10px] font-bold uppercase transition-all ${
                   modal.type === "ERROR"
-                    ? "bg-red-900/40 border border-red-600 text-red-500"
+                    ? "bg-red-100 dark:bg-red-900/40 border border-red-500 dark:border-red-600 text-red-700 dark:text-red-500"
                     : modal.type === "CONFIRM"
-                      ? "bg-yellow-600 text-black hover:bg-yellow-500"
-                      : "bg-emerald-600 text-black hover:bg-emerald-400"
+                      ? "bg-yellow-500 text-white dark:text-black hover:bg-yellow-600 dark:hover:bg-yellow-500"
+                      : "bg-emerald-600 text-white dark:text-black hover:bg-emerald-500 dark:hover:bg-emerald-400"
                 }`}
               >
                 ACEPTAR
