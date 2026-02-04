@@ -65,12 +65,12 @@ const App = () => {
   };
 
   return (
-    // Contenedor principal con transición de colores
+    // Se usa dark:bg-black para un negro puro
     <div className="w-full min-h-screen bg-gray-100 dark:bg-black text-gray-900 dark:text-white transition-colors duration-300 font-mono">
-      {/* BOTÓN FLOTANTE DE TEMA (TEXTO, SIN EMOJIS) */}
+      {/* BOTÓN FLOTANTE DE TEMA */}
       <button
         onClick={toggleTheme}
-        className="fixed top-4 right-4 z-50 px-4 py-2 text-[10px] font-bold border-2 border-gray-400 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg hover:border-cyan-500 transition-colors uppercase tracking-widest"
+        className="fixed top-4 right-4 z-50 px-4 py-2 text-[10px] font-bold border-2 border-gray-400 dark:border-gray-800 bg-white dark:bg-black shadow-lg hover:border-cyan-500 transition-colors uppercase tracking-widest"
       >
         {theme === "dark" ? "[ MODO CLARO ]" : "[ MODO OSCURO ]"}
       </button>

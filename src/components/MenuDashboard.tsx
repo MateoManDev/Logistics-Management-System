@@ -38,8 +38,11 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
     (s) => s.capacidad > 0 && s.stock / s.capacidad > 0.9,
   ).length;
 
+  // Clase base común para las tarjetas
+  const cardBaseClass =
+    "group relative p-6 border bg-white dark:bg-[#0a0a0a] border-gray-300 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-[#111] transition-all duration-300 text-left shadow-sm dark:shadow-lg";
+
   return (
-    // AQUÍ ESTÁ LA CLAVE: "bg-gray-100" (Claro) vs "dark:bg-black" (Oscuro)
     <div className="min-h-screen bg-gray-100 dark:bg-black p-8 font-mono flex flex-col items-center justify-center transition-colors duration-300">
       {/* HEADER */}
       <div className="w-full max-w-5xl mb-8 border-b-2 border-gray-300 dark:border-white/20 pb-4 flex justify-between items-end animate-in slide-in-from-top-4 duration-700">
@@ -63,10 +66,10 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
 
       {/* GRID DE BOTONES */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full max-w-5xl">
-        {/* 1. ADMINISTRACIÓN */}
+        {/* 1. ADMINISTRACIÓN (Cyan) */}
         <button
           onClick={() => alSeleccionar("ADMIN")}
-          className="group relative p-6 border bg-white dark:bg-gray-900/40 border-gray-300 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-cyan-500 dark:hover:border-cyan-500 transition-all duration-300 text-left overflow-hidden shadow-sm dark:shadow-lg hover:shadow-cyan-500/20"
+          className={`${cardBaseClass} hover:border-cyan-600 dark:hover:border-cyan-500 hover:shadow-cyan-500/20`}
         >
           <h3 className="text-cyan-600 dark:text-cyan-500 font-bold text-lg mb-1 group-hover:translate-x-1 transition-transform tracking-wider">
             ADMINISTRACIÓN
@@ -76,10 +79,10 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
           </p>
         </button>
 
-        {/* 2. CUPOS */}
+        {/* 2. CUPOS (Gris/Blanco) */}
         <button
           onClick={() => alSeleccionar("CUPOS")}
-          className="group relative p-6 border bg-white dark:bg-gray-900/40 border-gray-300 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-gray-900 dark:hover:border-white transition-all duration-300 text-left shadow-sm dark:shadow-lg"
+          className={`${cardBaseClass} hover:border-gray-900 dark:hover:border-white`}
         >
           <div className="flex justify-between items-start mb-1">
             <h3 className="text-gray-900 dark:text-white font-bold text-lg group-hover:translate-x-1 transition-transform tracking-wider">
@@ -94,10 +97,10 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
           </p>
         </button>
 
-        {/* 3. RECEPCIÓN */}
+        {/* 3. RECEPCIÓN (Amarillo) */}
         <button
           onClick={() => alSeleccionar("RECEPCION")}
-          className="group relative p-6 border bg-white dark:bg-gray-900/40 border-gray-300 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-yellow-500 transition-all duration-300 text-left shadow-sm dark:shadow-lg hover:shadow-yellow-500/20"
+          className={`${cardBaseClass} hover:border-yellow-600 dark:hover:border-yellow-500 hover:shadow-yellow-500/20`}
         >
           <div className="flex justify-between items-start mb-1">
             <h3 className="text-yellow-600 dark:text-yellow-500 font-bold text-lg group-hover:translate-x-1 transition-transform tracking-wider">
@@ -118,10 +121,10 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
           </p>
         </button>
 
-        {/* 4. CALIDAD */}
+        {/* 4. CALIDAD (Violeta) */}
         <button
           onClick={() => alSeleccionar("CALIDAD")}
-          className="group relative p-6 border bg-white dark:bg-gray-900/40 border-gray-300 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-violet-500 transition-all duration-300 text-left shadow-sm dark:shadow-lg hover:shadow-violet-500/20"
+          className={`${cardBaseClass} hover:border-violet-600 dark:hover:border-violet-500 hover:shadow-violet-500/20`}
         >
           <div className="flex justify-between items-start mb-1">
             <h3 className="text-violet-600 dark:text-violet-500 font-bold text-lg group-hover:translate-x-1 transition-transform tracking-wider">
@@ -138,10 +141,10 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
           </p>
         </button>
 
-        {/* 5. BALANZA */}
+        {/* 5. BALANZA (Esmeralda) */}
         <button
           onClick={() => alSeleccionar("PESAJE")}
-          className="group relative p-6 border bg-white dark:bg-gray-900/40 border-gray-300 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-900 hover:border-emerald-500 transition-all duration-300 text-left shadow-sm dark:shadow-lg hover:shadow-emerald-500/20"
+          className={`${cardBaseClass} hover:border-emerald-600 dark:hover:border-emerald-500 hover:shadow-emerald-500/20`}
         >
           <div className="flex justify-between items-start mb-1">
             <h3 className="text-emerald-600 dark:text-emerald-500 font-bold text-lg group-hover:translate-x-1 transition-transform tracking-wider">
@@ -160,10 +163,14 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
         <div className="grid grid-rows-2 gap-4">
           <button
             onClick={() => alSeleccionar("SILOS_RECHAZOS")}
-            className={`group px-6 py-3 border bg-white dark:bg-gray-900/40 transition-all duration-300 text-left flex justify-between items-center ${silosCriticos > 0 ? "border-red-600 animate-pulse bg-red-100 dark:bg-red-900/10" : "border-gray-300 dark:border-gray-800 hover:border-orange-500"}`}
+            className={`group px-6 py-3 border bg-white dark:bg-[#0a0a0a] transition-all duration-300 text-left flex justify-between items-center shadow-sm dark:shadow-lg hover:bg-gray-50 dark:hover:bg-[#111] ${
+              silosCriticos > 0
+                ? "border-red-600 animate-pulse bg-red-100 dark:bg-red-900/10"
+                : "border-gray-300 dark:border-gray-800 hover:border-orange-600 dark:hover:border-orange-500 hover:shadow-orange-500/20"
+            }`}
           >
             <div>
-              <h3 className="text-orange-600 dark:text-orange-500 font-bold text-sm tracking-wider">
+              <h3 className="text-orange-600 dark:text-orange-500 font-bold text-sm tracking-wider group-hover:translate-x-1 transition-transform">
                 MONITOR SILOS
               </h3>
               {silosCriticos > 0 ? (
@@ -180,10 +187,10 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
 
           <button
             onClick={() => alSeleccionar("REPORTES")}
-            className="group px-6 py-3 border border-gray-300 dark:border-gray-800 bg-white dark:bg-gray-900/40 hover:border-red-500 transition-all duration-300 text-left flex justify-between items-center"
+            className="group px-6 py-3 border border-gray-300 dark:border-gray-800 bg-white dark:bg-[#0a0a0a] hover:bg-gray-50 dark:hover:bg-[#111] hover:border-red-600 dark:hover:border-red-500 hover:shadow-red-500/20 transition-all duration-300 text-left flex justify-between items-center shadow-sm dark:shadow-lg"
           >
             <div>
-              <h3 className="text-red-600 dark:text-red-500 font-bold text-sm tracking-wider">
+              <h3 className="text-red-600 dark:text-red-500 font-bold text-sm tracking-wider group-hover:translate-x-1 transition-transform">
                 REPORTES
               </h3>
               <span className="text-[9px] text-gray-500 uppercase">
