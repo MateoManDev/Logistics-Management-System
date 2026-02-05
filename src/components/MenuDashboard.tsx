@@ -159,8 +159,27 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
           <p className="text-gray-500 text-[10px] uppercase">Control de Peso</p>
         </button>
 
-        {/* 6. MONITOR Y REPORTES */}
+        {/* 6. GESTIÓN FLOTA (Azul - NUEVO) */}
+        <button
+          onClick={() => alSeleccionar("FLOTA")}
+          className={`${cardBaseClass} hover:border-blue-600 dark:hover:border-blue-500 hover:shadow-blue-500/20`}
+        >
+          <div className="flex justify-between items-start mb-1">
+            <h3 className="text-blue-600 dark:text-blue-500 font-bold text-lg group-hover:translate-x-1 transition-transform tracking-wider">
+              FLOTA & GPS
+            </h3>
+            <span className="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 rounded border border-blue-200 dark:border-blue-900">
+              MANTENIMIENTO
+            </span>
+          </div>
+          <p className="text-gray-500 text-[10px] uppercase">
+            Control de Unidades
+          </p>
+        </button>
+
+        {/* 7. MONITOR Y REPORTES (DIVIDIDO) */}
         <div className="grid grid-rows-2 gap-4">
+          {/* SILOS (Naranja) */}
           <button
             onClick={() => alSeleccionar("SILOS_RECHAZOS")}
             className={`group px-6 py-3 border bg-white dark:bg-[#0a0a0a] transition-all duration-300 text-left flex justify-between items-center shadow-sm dark:shadow-lg hover:bg-gray-50 dark:hover:bg-[#111] ${
@@ -185,6 +204,7 @@ export const MenuDashboard = ({ alSeleccionar }: DashboardProps) => {
             </div>
           </button>
 
+          {/* REPORTES (Rojo) */}
           <button
             onClick={() => alSeleccionar("REPORTES")}
             className="group px-6 py-3 border border-gray-300 dark:border-gray-800 bg-white dark:bg-[#0a0a0a] hover:bg-gray-50 dark:hover:bg-[#111] hover:border-red-600 dark:hover:border-red-500 hover:shadow-red-500/20 transition-all duration-300 text-left flex justify-between items-center shadow-sm dark:shadow-lg"
