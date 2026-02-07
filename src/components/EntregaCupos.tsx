@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 // --- LIBRERÍAS DE VALIDACIÓN ---
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
@@ -9,29 +10,11 @@ import * as z from "zod";
 
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// Importamos 'es' desde la raíz de locale para evitar error de tipos
-import { es } from "date-fns/locale";
+// Importamos 'es' y 'en' para el datepicker
+import { es, enUS } from "date-fns/locale";
 
 registerLocale("es", es);
-
-// --- ESQUEMA DE VALIDACIÓN ZOD ---
-const cupoSchema = z.object({
-  patente: z
-    .string()
-    .min(6, "Mínimo 6 caracteres")
-    .regex(
-      new RegExp("^([A-Z]{3}\\s?\\d{3}|[A-Z]{2}\\s?\\d{3}\\s?[A-Z]{2})$", "i"),
-      "Formato inválido (Ej: AAA 123 o AA 123 BB)",
-    ),
-  codProd: z.string().min(1, "Debe seleccionar un producto"),
-  // Aceptamos null y undefined para que TypeScript no se queje
-  fecha: z
-    .date()
-    .nullable()
-    .refine((date) => date !== null, { message: "La fecha es obligatoria" }),
-});
-
-type CupoForm = z.infer<typeof cupoSchema>;
+registerLocale("en", enUS);
 
 // --- INTERFACES ---
 interface Operacion {
@@ -49,12 +32,38 @@ interface Producto {
   estado: "A" | "B";
 }
 
+type CupoForm = {
+  patente: string;
+  codProd: string;
+  fecha: Date | null;
+};
+
 export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
+  const { t, i18n } = useTranslation();
   const [productos] = useLocalStorage<Producto[]>("productos_dat", []);
   const [operaciones, setOperaciones] = useLocalStorage<Operacion[]>(
     "operaciones_dat",
     [],
   );
+
+  // --- ESQUEMA DE VALIDACIÓN ZOD ---
+  const cupoSchema = z.object({
+    patente: z
+      .string()
+      .min(6, t("cupos.errors.min6"))
+      .regex(
+        new RegExp(
+          "^([A-Z]{3}\\s?\\d{3}|[A-Z]{2}\\s?\\d{3}\\s?[A-Z]{2})$",
+          "i",
+        ),
+        t("cupos.errors.format"),
+      ),
+    codProd: z.string().min(1, t("cupos.errors.reqProduct")),
+    fecha: z
+      .date()
+      .nullable()
+      .refine((date) => date !== null, { message: t("cupos.errors.reqDate") }),
+  });
 
   const {
     register,
@@ -63,7 +72,6 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
     reset,
     formState: { errors },
   } = useForm<CupoForm>({
-    // FIX: Usamos 'as any' para silenciar el conflicto estricto de tipos de TypeScript entre Zod y RHF
     resolver: zodResolver(cupoSchema) as any,
     defaultValues: {
       patente: "",
@@ -72,10 +80,9 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
     },
   });
 
-  // FIX: Tipamos explícitamente el onSubmit
   const onSubmit: SubmitHandler<CupoForm> = (data) => {
     if (!data.fecha) {
-      toast.error("Fecha inválida");
+      toast.error(t("cupos.errors.invalidDate"));
       return;
     }
 
@@ -91,7 +98,7 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
     );
 
     if (existeCupo) {
-      toast.error("DUPLICADO: YA EXISTE CUPO PARA ESTA UNIDAD HOY");
+      toast.error(t("cupos.errors.duplicate"));
       return;
     }
 
@@ -100,7 +107,7 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
     );
 
     if (!productoValido) {
-      toast.error("ERROR: PRODUCTO NO VÁLIDO O INACTIVO");
+      toast.error(t("cupos.errors.invalidProduct"));
       return;
     }
 
@@ -115,8 +122,8 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
 
     setOperaciones([...operaciones, nuevaOperacion]);
 
-    toast.success(`CUPO OTORGADO: ${nuevaOperacion.patente}`, {
-      description: `Producto: ${productoValido.nombre} - Fecha: ${fechaFormateada}`,
+    toast.success(`${t("cupos.success.granted")}: ${nuevaOperacion.patente}`, {
+      description: `${t("cupos.success.product")}: ${productoValido.nombre} - ${t("cupos.success.date")}: ${fechaFormateada}`,
     });
 
     reset({
@@ -131,7 +138,7 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
       <div className="flex items-center justify-center min-h-screen w-full bg-gray-100 dark:bg-black p-4 transition-all duration-300">
         <div className="border-2 border-gray-300 dark:border-white p-8 bg-white dark:bg-[#0a0a0a] shadow-2xl dark:shadow-[0_0_30px_rgba(255,255,255,0.1)] w-full max-w-md transition-colors duration-300">
           <h2 className="text-center mb-8 text-xl font-bold tracking-[0.2em] text-gray-900 dark:text-white border-b-2 border-gray-300 dark:border-white pb-4 uppercase">
-            [ Registro de Cupos ]
+            {t("cupos.title")}
           </h2>
 
           <form
@@ -140,7 +147,7 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
           >
             <div className="flex flex-col gap-1">
               <label className="text-xs text-gray-600 dark:text-gray-500 uppercase tracking-widest">
-                Dominio / Patente{" "}
+                {t("cupos.labels.plate")}{" "}
                 {errors.patente && (
                   <span className="text-red-500 font-bold ml-2 text-[10px]">
                     * {errors.patente.message}
@@ -155,7 +162,7 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
                     {...rest}
                     type="text"
                     className={`bg-gray-50 dark:bg-black border p-3 text-gray-900 dark:text-white focus:border-blue-500 outline-none transition-all uppercase placeholder:text-gray-400 dark:placeholder:text-gray-800 ${errors.patente ? "border-red-500" : "border-gray-300 dark:border-gray-700"}`}
-                    placeholder="AAA 123 o AA 123 BB"
+                    placeholder={t("cupos.placeholders.plate")}
                     autoComplete="off"
                     onChange={(e) => {
                       e.target.value = e.target.value.toUpperCase();
@@ -168,9 +175,11 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
 
             <div className="flex flex-col gap-1 relative z-50">
               <label className="text-xs text-gray-600 dark:text-gray-500 uppercase tracking-widest">
-                Fecha de Operación{" "}
+                {t("cupos.labels.date")}{" "}
                 {errors.fecha && (
-                  <span className="text-red-500 font-bold ml-2">*</span>
+                  <span className="text-red-500 font-bold ml-2 text-[10px]">
+                    * {errors.fecha.message}
+                  </span>
                 )}
               </label>
               <Controller
@@ -178,13 +187,12 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
                 name="fecha"
                 render={({ field }) => (
                   <DatePicker
-                    // FIX: Aseguramos que nunca sea undefined
                     selected={field.value ?? null}
                     onChange={(date: Date | null) => field.onChange(date)}
-                    locale="es"
+                    locale={i18n.language === "EN" ? "en" : "es"}
                     dateFormat="dd/MM/yyyy"
                     className="w-full bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-3 text-gray-900 dark:text-white focus:border-blue-500 outline-none transition-all cursor-pointer"
-                    placeholderText="Seleccione fecha"
+                    placeholderText={t("cupos.placeholders.date")}
                   />
                 )}
               />
@@ -192,10 +200,11 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
 
             <div className="flex flex-col gap-1">
               <label className="text-xs text-gray-600 dark:text-gray-500 uppercase tracking-widest">
-                Insumo / Producto{" "}
+                {t("cupos.labels.product")}{" "}
+                {/* AQUÍ ESTABA EL ERROR: Usar message dinámico */}
                 {errors.codProd && (
                   <span className="text-red-500 font-bold ml-2 text-[10px]">
-                    * Requerido
+                    * {errors.codProd.message}
                   </span>
                 )}
               </label>
@@ -203,7 +212,7 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
                 {...register("codProd")}
                 className={`bg-gray-50 dark:bg-black border p-3 text-gray-900 dark:text-white focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer ${errors.codProd ? "border-red-500" : "border-gray-300 dark:border-gray-700"}`}
               >
-                <option value="">-- SELECCIONAR --</option>
+                <option value="">{t("cupos.placeholders.select")}</option>
                 {productos
                   .filter((p) => p.estado === "A")
                   .map((p) => (
@@ -219,7 +228,7 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
                 type="submit"
                 className="mt-2 bg-transparent border border-gray-900 dark:border-white text-gray-900 dark:text-white py-2 hover:bg-gray-900 dark:hover:bg-white hover:text-white dark:hover:text-black transition-all font-bold uppercase"
               >
-                [ Otorgar Cupo ]
+                {t("cupos.buttons.grant")}
               </button>
 
               <button
@@ -227,7 +236,7 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
                 onClick={onVolver}
                 className="w-full text-red-600 dark:text-red-700 text-[10px] font-bold border-t border-gray-300 dark:border-gray-800 pt-4 text-center mt-6 uppercase hover:text-red-500 transition-all"
               >
-                &lt;&lt; Volver al Menú Principal
+                {t("cupos.buttons.back")}
               </button>
             </div>
           </form>

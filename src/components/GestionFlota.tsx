@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 // --- LIBRERÍAS DE VALIDACIÓN ---
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
@@ -10,8 +11,9 @@ import * as z from "zod";
 // --- DATEPICKER ---
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { es } from "date-fns/locale";
+import { es, enUS } from "date-fns/locale";
 registerLocale("es", es);
+registerLocale("en", enUS);
 
 // --- MAPAS ---
 import {
@@ -59,42 +61,6 @@ const IconTruck = () => (
       strokeLinejoin="round"
       strokeWidth={2}
       d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 10-4 0 2 2 0 004 0zm10 0a2 2 0 10-4 0 2 2 0 004 0z"
-    />
-  </svg>
-);
-const IconCheck = () => (
-  <svg
-    className="w-4 h-4"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M5 13l4 4L19 7"
-    />
-  </svg>
-);
-const IconWrench = () => (
-  <svg
-    className="w-4 h-4"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
     />
   </svg>
 );
@@ -208,30 +174,19 @@ const LocationSelector = ({
   return null;
 };
 
-// --- SCHEMA Y TIPOS ---
-const camionSchema = z.object({
-  patente: z
-    .string()
-    .min(6, "Mínimo 6 caracteres")
-    .regex(
-      new RegExp("^([A-Z]{3}\\s?\\d{3}|[A-Z]{2}\\s?\\d{3}\\s?[A-Z]{2})$", "i"),
-      "Formato inválido",
-    ),
-  chofer: z.string().min(3, "Nombre muy corto"),
-  estado: z.enum(["DISPONIBLE", "EN_VIAJE", "TALLER", "BAJA"]),
-  tipo: z.enum(["GRANO", "LIQUIDO", "GENERAL"]),
-  vencimientoVTV: z
-    .date()
-    .nullable()
-    .refine((date) => date !== null, { message: "La fecha es obligatoria" }),
-  kmAceite: z.coerce.number().min(0, "Debe ser positivo"),
-  latitud: z.string().optional(),
-  longitud: z.string().optional(),
-});
+// --- TIPOS ---
+type CamionForm = {
+  patente: string;
+  chofer: string;
+  estado: "DISPONIBLE" | "EN_VIAJE" | "TALLER" | "BAJA";
+  tipo: "GRANO" | "LIQUIDO" | "GENERAL";
+  vencimientoVTV: Date | null;
+  kmAceite: number;
+  latitud?: string;
+  longitud?: string;
+};
 
-type CamionForm = z.infer<typeof camionSchema>;
-
-interface Camion extends CamionForm {
+interface Camion extends Omit<CamionForm, "vencimientoVTV"> {
   vencimientoVTV: any;
 }
 
@@ -251,10 +206,36 @@ interface ModalDelete {
 }
 
 export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
+  const { t, i18n } = useTranslation();
+
   const [flota, setFlota] = useLocalStorage<Camion[]>("flota_dat", []);
   const [mantenimientos, setMantenimientos] = useLocalStorage<
     RegistroMantenimiento[]
   >("mantenimientos_dat", []);
+
+  // --- SCHEMA DINÁMICO ---
+  const camionSchema = z.object({
+    patente: z
+      .string()
+      .min(6, t("flota.errors.min6"))
+      .regex(
+        new RegExp(
+          "^([A-Z]{3}\\s?\\d{3}|[A-Z]{2}\\s?\\d{3}\\s?[A-Z]{2})$",
+          "i",
+        ),
+        t("flota.errors.format"),
+      ),
+    chofer: z.string().min(3, t("flota.errors.shortName")),
+    estado: z.enum(["DISPONIBLE", "EN_VIAJE", "TALLER", "BAJA"]),
+    tipo: z.enum(["GRANO", "LIQUIDO", "GENERAL"]),
+    vencimientoVTV: z
+      .date()
+      .nullable()
+      .refine((date) => date !== null, { message: t("flota.errors.reqDate") }),
+    kmAceite: z.coerce.number().min(0, t("flota.errors.positive")),
+    latitud: z.string().optional(),
+    longitud: z.string().optional(),
+  });
 
   const {
     register,
@@ -298,7 +279,6 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
   const [mantCosto, setMantCosto] = useState("");
   const [mantKm, setMantKm] = useState("");
 
-  // DEFINICIÓN DE FUNCIONES
   const onSubmit: SubmitHandler<CamionForm> = (data) => {
     const dataFinal = {
       ...data,
@@ -313,14 +293,14 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
       setFlota(
         flota.map((c) => (c.patente === dataFinal.patente ? dataFinal : c)),
       );
-      toast.success("UNIDAD ACTUALIZADA CORRECTAMENTE");
+      toast.success(t("flota.success.updated"));
     } else {
       if (flota.find((c) => c.patente === dataFinal.patente)) {
-        toast.error("LA PATENTE YA EXISTE");
+        toast.error(t("flota.errors.exists"));
         return;
       }
-      setFlota([...flota, dataFinal]);
-      toast.success("UNIDAD AGREGADA CON ÉXITO");
+      setFlota([...flota, dataFinal as any]);
+      toast.success(t("flota.success.added"));
     }
     limpiarForm();
   };
@@ -339,13 +319,12 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
       const [y, m, d] = c.vencimientoVTV.split("-").map(Number);
       setValue("vencimientoVTV", new Date(y, m - 1, d));
     } else {
-      // FIX: Usamos 'as any' para forzar el null y eliminar el error rojo
       setValue("vencimientoVTV", null as any);
     }
 
     setVistaMapa(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
-    toast.info(`EDITANDO UNIDAD: ${c.patente}`);
+    toast.info(`${t("flota.success.editing")}: ${c.patente}`);
   };
 
   const limpiarForm = () => {
@@ -365,7 +344,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
   const handleMapClick = (lat: string, lng: string) => {
     setValue("latitud", lat);
     setValue("longitud", lng);
-    toast.success("UBICACIÓN SELECCIONADA");
+    toast.success(t("flota.success.locationSelected"));
   };
 
   const cambioRapidoEstado = (
@@ -376,10 +355,9 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
       c.patente === patente ? { ...c, estado: nuevoEstado } : c,
     );
     setFlota(nuevaFlota);
-    toast.success(`ESTADO ACTUALIZADO: ${nuevoEstado}`);
+    toast.success(`${t("flota.success.statusUpdated")}: ${nuevoEstado}`);
   };
 
-  // FUNCIONES DE HISTORIAL
   const abrirHistorial = (c: Camion) => {
     setCamionHistorial(c);
     setMantKm(String(c.kmAceite));
@@ -393,7 +371,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
       const p = modalDelete.patente;
       setFlota(flota.filter((c) => c.patente !== p));
       setMantenimientos(mantenimientos.filter((m) => m.patente !== p));
-      toast.success("UNIDAD ELIMINADA");
+      toast.success(t("flota.success.deleted"));
       if (editando && patenteActual === p) limpiarForm();
     }
     setModalDelete({ isOpen: false, patente: null });
@@ -401,7 +379,8 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
 
   const guardarMantenimiento = () => {
     if (!camionHistorial) return;
-    if (!mantDesc || !mantCosto) return toast.warning("Complete datos");
+    if (!mantDesc || !mantCosto)
+      return toast.warning(t("flota.errors.completeData"));
 
     const nuevoRegistro: RegistroMantenimiento = {
       id: Date.now().toString(),
@@ -425,16 +404,16 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
       );
       setFlota(flotaActualizada);
       setCamionHistorial({ ...camionHistorial, kmAceite: Number(mantKm) });
-      toast.success("KM ACTUALIZADO AUTOMÁTICAMENTE");
+      toast.success(t("flota.success.kmUpdated"));
     } else {
-      toast.success("REGISTRO GUARDADO");
+      toast.success(t("flota.success.recordSaved"));
     }
     setMantDesc("");
     setMantCosto("");
   };
 
   const eliminarMantenimiento = (id: string) => {
-    if (window.confirm("¿Borrar registro?"))
+    if (window.confirm(t("flota.deleteModal.confirmDeleteRecord")))
       setMantenimientos(mantenimientos.filter((m) => m.id !== id));
   };
 
@@ -466,10 +445,10 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
         <div className="border-b-2 border-blue-600 dark:border-blue-500 pb-4 flex justify-between items-end">
           <div>
             <h2 className="text-2xl font-bold text-blue-700 dark:text-blue-500 uppercase italic tracking-wider">
-              [ Gestión de Flota ]
+              {t("flota.title")}
             </h2>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Control total de unidades
+              {t("flota.subtitle")}
             </p>
           </div>
           <div className="flex gap-2">
@@ -479,11 +458,11 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
             >
               {vistaMapa ? (
                 <>
-                  <IconList /> VER LISTADO
+                  <IconList /> {t("flota.buttons.viewList")}
                 </>
               ) : (
                 <>
-                  <IconMap /> VER MAPA GPS
+                  <IconMap /> {t("flota.buttons.viewMap")}
                 </>
               )}
             </button>
@@ -491,7 +470,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
               onClick={onVolver}
               className="text-xs font-bold text-red-600 hover:text-red-800 dark:text-red-500 uppercase border border-transparent hover:border-red-500 px-3 py-2"
             >
-              &lt;&lt; Volver
+              {t("flota.buttons.back")}
             </button>
           </div>
         </div>
@@ -525,7 +504,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                           onClick={() => setVistaMapa(false)}
                           className="mt-2 text-blue-500 underline"
                         >
-                          Ver Detalles
+                          {t("flota.buttons.details")}
                         </button>
                       </div>
                     </Popup>
@@ -541,7 +520,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
             >
               {editando && (
                 <div className="bg-yellow-500 text-white dark:text-black font-bold text-center text-xs uppercase py-2 mb-4 animate-pulse tracking-widest">
-                  ⚠ MODO EDICIÓN ACTIVO: {patenteActual}
+                  {t("flota.form.editMode")}: {patenteActual}
                 </div>
               )}
 
@@ -549,15 +528,15 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                 className={`text-sm font-bold uppercase mb-4 border-l-4 pl-2 ${editando ? "text-yellow-700 dark:text-yellow-500 border-yellow-500" : "text-gray-900 dark:text-white border-blue-500"}`}
               >
                 {editando
-                  ? "Editar Unidad Existente"
-                  : "Registrar Nueva Unidad"}
+                  ? t("flota.form.editTitle")
+                  : t("flota.form.newTitle")}
               </h3>
 
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="flex flex-col">
                     <label className="text-[10px] text-gray-500 font-bold mb-1">
-                      PATENTE{" "}
+                      {t("flota.form.labels.plate")}{" "}
                       {errors.patente && (
                         <span className="text-red-500">
                           * {errors.patente.message}
@@ -575,52 +554,58 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                           }}
                           className={`p-2 bg-gray-50 dark:bg-black border ${errors.patente ? "border-red-500" : "border-gray-300 dark:border-gray-700"} text-gray-900 dark:text-white uppercase text-xs outline-none focus:border-blue-500`}
                           disabled={editando}
-                          placeholder="AAA 123"
+                          placeholder={t("flota.form.placeholders.plate")}
                         />
                       );
                     })()}
                   </div>
                   <div className="flex flex-col">
                     <label className="text-[10px] text-gray-500 font-bold mb-1">
-                      CHOFER{" "}
+                      {t("flota.form.labels.driver")}{" "}
                       {errors.chofer && <span className="text-red-500">*</span>}
                     </label>
                     <input
                       {...register("chofer")}
                       className="p-2 bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white uppercase text-xs outline-none focus:border-blue-500"
-                      placeholder="NOMBRE APELLIDO"
+                      placeholder={t("flota.form.placeholders.driver")}
                     />
                   </div>
                   <div className="flex flex-col">
                     <label className="text-[10px] text-gray-500 font-bold mb-1">
-                      ESTADO
+                      {t("flota.form.labels.status")}
                     </label>
                     <select
                       {...register("estado")}
                       className="p-2 bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white text-xs outline-none focus:border-blue-500"
                     >
-                      <option value="DISPONIBLE">🟢 DISPONIBLE</option>
-                      <option value="EN_VIAJE">🔵 EN VIAJE</option>
-                      <option value="TALLER">🔴 EN TALLER</option>
+                      <option value="DISPONIBLE">
+                        {t("flota.status.available")}
+                      </option>
+                      <option value="EN_VIAJE">{t("flota.status.trip")}</option>
+                      <option value="TALLER">
+                        {t("flota.status.workshop")}
+                      </option>
                     </select>
                   </div>
                   <div className="flex flex-col">
                     <label className="text-[10px] text-gray-500 font-bold mb-1">
-                      TIPO CARGA
+                      {t("flota.form.labels.type")}
                     </label>
                     <select
                       {...register("tipo")}
                       className="p-2 bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white text-xs outline-none focus:border-blue-500"
                     >
-                      <option value="GRANO">🌽 GRANO</option>
-                      <option value="LIQUIDO">💧 LÍQUIDO</option>
-                      <option value="GENERAL">📦 GENERAL</option>
+                      <option value="GRANO">{t("flota.types.grain")}</option>
+                      <option value="LIQUIDO">{t("flota.types.liquid")}</option>
+                      <option value="GENERAL">
+                        {t("flota.types.general")}
+                      </option>
                     </select>
                   </div>
 
                   <div className="flex flex-col relative z-50">
                     <label className="text-[10px] text-gray-500 font-bold mb-1">
-                      VENCIMIENTO VTV
+                      {t("flota.form.labels.vtv")}
                     </label>
                     <Controller
                       control={control}
@@ -628,13 +613,12 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                       render={({ field }) => (
                         <DatePicker
                           selected={field.value ?? null}
-                          // FIX: Tipado explícito aquí para arreglar el error de imagen 3e5cc1.png
                           onChange={(date: Date | null) => field.onChange(date)}
-                          locale="es"
+                          locale={i18n.language === "EN" ? "en" : "es"}
                           dateFormat="dd/MM/yyyy"
                           popperClassName="z-[9999]"
                           className="w-full p-2 bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white text-xs outline-none focus:border-blue-500 cursor-pointer"
-                          placeholderText="SELECCIONAR FECHA"
+                          placeholderText={t("flota.form.placeholders.date")}
                         />
                       )}
                     />
@@ -647,7 +631,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
 
                   <div className="flex flex-col">
                     <label className="text-[10px] text-gray-500 font-bold mb-1">
-                      KM ACEITE{" "}
+                      {t("flota.form.labels.oil")}{" "}
                       {errors.kmAceite && (
                         <span className="text-red-500">*</span>
                       )}
@@ -663,7 +647,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                   <div className="md:col-span-4 border border-blue-200 dark:border-blue-900/50 p-3 bg-blue-50 dark:bg-blue-900/10 z-0">
                     <div className="flex justify-between items-center mb-2">
                       <label className="text-[10px] text-blue-700 dark:text-blue-400 font-bold flex items-center gap-1">
-                        <IconPin /> SELECCIÓN DE UBICACIÓN (GPS)
+                        <IconPin /> {t("flota.form.labels.location")}
                       </label>
                       <div className="flex gap-2">
                         <input
@@ -701,7 +685,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                         )}
                       </MapContainer>
                       <div className="absolute bottom-1 right-1 z-[400] bg-white/80 dark:bg-black/80 px-2 py-1 text-[8px] text-gray-600 dark:text-gray-300 pointer-events-none">
-                        Haga clic en el mapa para ubicar
+                        {t("flota.form.mapHelp")}
                       </div>
                     </div>
                   </div>
@@ -712,7 +696,9 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                     type="submit"
                     className={`text-white px-6 py-3 text-xs font-bold uppercase transition-colors shadow-sm flex-1 ${editando ? "bg-yellow-600 hover:bg-yellow-700" : "bg-blue-600 hover:bg-blue-700"}`}
                   >
-                    {editando ? "GUARDAR CAMBIOS" : "REGISTRAR UNIDAD"}
+                    {editando
+                      ? t("flota.buttons.save")
+                      : t("flota.buttons.register")}
                   </button>
                   {editando && (
                     <button
@@ -720,7 +706,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                       onClick={limpiarForm}
                       className="bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-4 py-3 text-xs font-bold uppercase hover:bg-gray-300 dark:hover:bg-gray-700"
                     >
-                      Cancelar
+                      {t("flota.buttons.cancel")}
                     </button>
                   )}
                 </div>
@@ -729,7 +715,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
 
             <div className="flex gap-4">
               <input
-                placeholder="🔍 Buscar patente o chofer..."
+                placeholder={t("flota.form.placeholders.search")}
                 className="flex-1 p-3 bg-white dark:bg-[#0a0a0a] border border-gray-300 dark:border-gray-800 text-gray-900 dark:text-white text-xs outline-none focus:border-blue-500"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
@@ -739,10 +725,12 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                 value={filtroEstado}
                 onChange={(e) => setFiltroEstado(e.target.value)}
               >
-                <option value="TODOS">TODOS</option>
-                <option value="DISPONIBLE">🟢 DISPONIBLES</option>
-                <option value="EN_VIAJE">🔵 EN VIAJE</option>
-                <option value="TALLER">🔴 EN TALLER</option>
+                <option value="TODOS">{t("flota.status.all")}</option>
+                <option value="DISPONIBLE">
+                  {t("flota.status.available_plural")}
+                </option>
+                <option value="EN_VIAJE">{t("flota.status.trip")}</option>
+                <option value="TALLER">{t("flota.status.workshop")}</option>
               </select>
             </div>
 
@@ -767,6 +755,10 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                         </p>
                       </div>
                       <div className="relative">
+                        {/* --- CORRECCIÓN AQUÍ ---
+                            Se eliminó el <div> con el emoji absoluto.
+                            Se cambió pl-6 a pl-2 para que el texto (que ya tiene emoji) se vea bien.
+                        */}
                         <select
                           value={c.estado}
                           onChange={(e) =>
@@ -775,7 +767,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                               e.target.value as Camion["estado"],
                             )
                           }
-                          className={`appearance-none pl-6 pr-2 py-1 font-bold text-[9px] border rounded cursor-pointer outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-black transition-colors uppercase
+                          className={`appearance-none pl-2 pr-2 py-1 font-bold text-[9px] border rounded cursor-pointer outline-none focus:ring-2 focus:ring-offset-1 dark:focus:ring-offset-black transition-colors uppercase
                                             ${
                                               c.estado === "DISPONIBLE"
                                                 ? "bg-green-50 text-green-700 border-green-500 dark:bg-green-900/20 dark:text-green-400 focus:ring-green-400"
@@ -789,28 +781,21 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                             value="DISPONIBLE"
                             className="bg-white text-gray-900 dark:bg-black dark:text-white font-bold"
                           >
-                            DISPONIBLE
+                            {t("flota.status.available")}
                           </option>
                           <option
                             value="EN_VIAJE"
                             className="bg-white text-gray-900 dark:bg-black dark:text-white font-bold"
                           >
-                            EN VIAJE
+                            {t("flota.status.trip")}
                           </option>
                           <option
                             value="TALLER"
                             className="bg-white text-gray-900 dark:bg-black dark:text-white font-bold"
                           >
-                            TALLER
+                            {t("flota.status.workshop")}
                           </option>
                         </select>
-                        <div className="absolute left-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-[10px]">
-                          {c.estado === "DISPONIBLE"
-                            ? "🟢"
-                            : c.estado === "TALLER"
-                              ? "🔴"
-                              : "🔵"}
-                        </div>
                       </div>
                     </div>
 
@@ -827,7 +812,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                       </div>
                       <div className="flex flex-col text-right">
                         <span className="text-[9px] text-gray-400 font-bold">
-                          ACEITE
+                          {t("flota.form.labels.oil")}
                         </span>
                         <span className="text-xs font-bold text-gray-600 dark:text-gray-300">
                           {c.kmAceite.toLocaleString()} km
@@ -840,7 +825,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                         onClick={() => abrirHistorial(c)}
                         className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 py-1 text-[10px] font-bold uppercase hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors border border-gray-300 dark:border-gray-700 flex items-center justify-center gap-1"
                       >
-                        <IconHistory /> Historial
+                        <IconHistory /> {t("flota.buttons.history")}
                       </button>
                       <button
                         onClick={() => cargarDatosEdicion(c)}
@@ -871,7 +856,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
             <div className="p-4 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-gray-50 dark:bg-[#111]">
               <div>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <IconHistory /> BITÁCORA
+                  <IconHistory /> {t("flota.log.title")}
                 </h3>
                 <p className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">
                   {camionHistorial.patente}
@@ -887,14 +872,13 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
               <div className="bg-blue-50 dark:bg-blue-900/10 p-3 border border-blue-100 dark:border-blue-900/30 mb-6 rounded-sm">
                 <p className="text-[10px] font-bold text-blue-700 dark:text-blue-400 uppercase mb-2">
-                  Nuevo Registro:
+                  {t("flota.log.newRecord")}
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                   <DatePicker
                     selected={mantFecha}
-                    // FIX: Tipado explícito del parámetro date
                     onChange={(date: Date | null) => setMantFecha(date)}
-                    locale="es"
+                    locale={i18n.language === "EN" ? "en" : "es"}
                     dateFormat="dd/MM/yyyy"
                     popperClassName="z-[9999]"
                     className="w-full p-1 bg-white dark:bg-black border text-xs dark:text-white dark:border-gray-700 outline-none cursor-pointer"
@@ -904,11 +888,17 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                     onChange={(e) => setMantTipo(e.target.value as any)}
                     className="p-1 bg-white dark:bg-black border text-xs dark:text-white dark:border-gray-700 outline-none"
                   >
-                    <option value="MECANICA">MECÁNICA</option>
-                    <option value="ACEITE">ACEITE</option>
-                    <option value="NEUMATICOS">NEUMÁTICOS</option>
-                    <option value="PAPELES">PAPELES</option>
-                    <option value="OTRO">OTRO</option>
+                    <option value="MECANICA">
+                      {t("flota.log.types.mech")}
+                    </option>
+                    <option value="ACEITE">{t("flota.log.types.oil")}</option>
+                    <option value="NEUMATICOS">
+                      {t("flota.log.types.tires")}
+                    </option>
+                    <option value="PAPELES">
+                      {t("flota.log.types.paper")}
+                    </option>
+                    <option value="OTRO">{t("flota.log.types.other")}</option>
                   </select>
                   <input
                     type="number"
@@ -928,11 +918,11 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                     onClick={guardarMantenimiento}
                     className="bg-blue-600 text-white font-bold text-xs uppercase hover:bg-blue-700"
                   >
-                    AGREGAR
+                    {t("flota.buttons.add")}
                   </button>
                 </div>
                 <input
-                  placeholder="Descripción..."
+                  placeholder={t("flota.form.placeholders.desc")}
                   value={mantDesc}
                   onChange={(e) => setMantDesc(e.target.value)}
                   className="w-full mt-2 p-2 bg-white dark:bg-black border border-gray-300 dark:border-gray-700 text-xs dark:text-white outline-none"
@@ -943,7 +933,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                   (m) => m.patente === camionHistorial.patente,
                 ).length === 0 ? (
                   <p className="text-center text-xs text-gray-400 py-8 italic">
-                    Sin registros.
+                    {t("flota.log.empty")}
                   </p>
                 ) : (
                   mantenimientos
@@ -997,7 +987,7 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                 <IconTrash />
               </div>
               <h3 className="text-lg font-bold text-red-600 dark:text-red-500 uppercase tracking-widest mb-2">
-                ¿Eliminar Unidad?
+                {t("flota.deleteModal.title")}
               </h3>
               <div className="flex gap-2 w-full">
                 <button
@@ -1006,13 +996,13 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                   }
                   className="flex-1 py-3 border border-gray-300 dark:border-gray-700 text-gray-500 font-bold text-xs uppercase hover:bg-gray-100 dark:hover:text-white transition-colors"
                 >
-                  Cancelar
+                  {t("flota.buttons.cancel")}
                 </button>
                 <button
                   onClick={confirmarEliminacion}
                   className="flex-1 py-3 bg-red-600 text-white font-bold text-xs uppercase hover:bg-red-700 transition-colors shadow-lg shadow-red-500/30"
                 >
-                  CONFIRMAR
+                  {t("flota.buttons.confirm")}
                 </button>
               </div>
             </div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useTranslation } from "react-i18next"; // <--- Importamos Hook
 
 // --- INTERFACES ---
 interface Operacion {
@@ -17,6 +18,7 @@ interface Producto {
 }
 
 export const Reportes = ({ onVolver }: { onVolver: () => void }) => {
+  const { t } = useTranslation(); // <--- Hook de traducción
   const [operaciones] = useLocalStorage<Operacion[]>("operaciones_dat", []);
   const [productos] = useLocalStorage<Producto[]>("productos_dat", []);
   const [filtroPeriodo, setFiltroPeriodo] = useState("HOY");
@@ -28,7 +30,7 @@ export const Reportes = ({ onVolver }: { onVolver: () => void }) => {
       ? operaciones
       : operaciones.filter((op) => op.fechacup === hoy);
 
-  // --- LÓGICA CORREGIDA ---
+  // --- LÓGICA DE INDICADORES ---
   const cantCupos = opsFiltradas.length;
 
   // Recibidos: Que NO estén pendientes y que NO hayan sido rechazados
@@ -69,12 +71,11 @@ export const Reportes = ({ onVolver }: { onVolver: () => void }) => {
 
   return (
     <div className="flex items-center justify-center min-h-screen w-full bg-gray-100 dark:bg-black p-4 font-mono transition-colors duration-300">
-      {/* CORRECCIÓN: dark:bg-[#0a0a0a] */}
       <div className="border-2 border-red-600 dark:border-red-700 p-8 bg-white dark:bg-[#0a0a0a] shadow-xl dark:shadow-[0_0_20px_rgba(185,28,28,0.2)] w-full max-w-2xl transition-colors duration-300">
         {/* ENCABEZADO */}
         <div className="flex justify-between items-center mb-6 border-b-2 border-red-200 dark:border-red-900 pb-4">
           <h2 className="text-xl font-bold tracking-[0.2em] text-red-600 dark:text-red-500 uppercase italic">
-            [ Centro de Reportes ]
+            {t("reportes.title")}
           </h2>
 
           <div className="flex flex-col items-end">
@@ -83,45 +84,45 @@ export const Reportes = ({ onVolver }: { onVolver: () => void }) => {
               onChange={(e) => setFiltroPeriodo(e.target.value)}
               className="bg-gray-50 dark:bg-black border border-red-300 dark:border-red-900 text-red-700 dark:text-red-500 text-[10px] px-2 py-1 outline-none uppercase cursor-pointer"
             >
-              <option value="HOY">Solo Hoy</option>
-              <option value="TODO">Historial Completo</option>
+              <option value="HOY">{t("reportes.filters.today")}</option>
+              <option value="TODO">{t("reportes.filters.all")}</option>
             </select>
           </div>
         </div>
 
-        {/* DASHBOARD CORREGIDO */}
+        {/* DASHBOARD */}
         <div className="grid grid-cols-3 gap-3 mb-8">
           <div className="bg-gray-50 dark:bg-black/60 p-4 border border-red-200 dark:border-red-900/40 text-center shadow-sm dark:shadow-inner">
             <p className="text-[10px] text-red-800 dark:text-red-700 uppercase font-bold mb-1">
-              Eficiencia Logística
+              {t("reportes.stats.efficiency")}
             </p>
             <p className="text-3xl text-gray-900 dark:text-white font-bold">
               {cumplimiento}%
             </p>
             <p className="text-[8px] text-gray-500 dark:text-gray-600 mt-1 uppercase italic">
-              Éxito vs Cupos
+              {t("reportes.stats.efficiencyDesc")}
             </p>
           </div>
           <div className="bg-gray-50 dark:bg-black/60 p-4 border border-red-200 dark:border-red-900/40 text-center shadow-sm dark:shadow-inner">
             <p className="text-[10px] text-red-800 dark:text-red-700 uppercase font-bold mb-1">
-              Aceptados
+              {t("reportes.stats.accepted")}
             </p>
             <p className="text-3xl text-green-600 dark:text-green-500 font-bold">
               {cantRecibidos}
             </p>
             <p className="text-[8px] text-gray-500 dark:text-gray-600 mt-1 uppercase italic">
-              En planta / Fin
+              {t("reportes.stats.acceptedDesc")}
             </p>
           </div>
           <div className="bg-gray-50 dark:bg-black/60 p-4 border border-red-200 dark:border-red-900/40 text-center shadow-sm dark:shadow-inner">
             <p className="text-[10px] text-red-800 dark:text-red-700 uppercase font-bold mb-1">
-              Rechazados
+              {t("reportes.stats.rejected")}
             </p>
             <p className="text-3xl text-red-600 dark:text-red-500 font-bold">
               {cantRechazados}
             </p>
             <p className="text-[8px] text-gray-500 dark:text-gray-600 mt-1 uppercase italic">
-              Fuera de Calidad
+              {t("reportes.stats.rejectedDesc")}
             </p>
           </div>
         </div>
@@ -138,30 +139,30 @@ export const Reportes = ({ onVolver }: { onVolver: () => void }) => {
                   {prod.nombre}
                 </h3>
                 <span className="text-[9px] text-gray-500 dark:text-gray-600 font-bold uppercase italic">
-                  Total Cupos: {prod.cantidad}
+                  {t("reportes.list.totalTickets")} {prod.cantidad}
                 </span>
               </div>
 
               <div className="grid grid-cols-3 gap-4 border-t border-red-200 dark:border-red-900/20 pt-3">
                 <div className="flex flex-col">
                   <span className="text-[8px] text-gray-500 uppercase">
-                    Kg Ingresados
+                    {t("reportes.list.kgIn")}
                   </span>
                   <span className="text-gray-900 dark:text-white font-bold text-xs">
-                    {prod.neto} KG
+                    {prod.neto.toLocaleString()} KG
                   </span>
                 </div>
                 <div className="flex flex-col text-center">
                   <span className="text-[8px] text-gray-500 uppercase">
-                    Promedio Neto
+                    {t("reportes.list.avgNet")}
                   </span>
                   <span className="text-gray-900 dark:text-white font-bold text-xs">
-                    {prod.promedio} KG
+                    {prod.promedio.toLocaleString()} KG
                   </span>
                 </div>
                 <div className="flex flex-col text-right">
                   <span className="text-[8px] text-gray-500 uppercase">
-                    Rechazos
+                    {t("reportes.list.rejected")}
                   </span>
                   <span
                     className={`font-bold text-xs ${prod.rechazados > 0 ? "text-red-600 dark:text-red-500" : "text-gray-400 dark:text-gray-800"}`}
@@ -178,7 +179,7 @@ export const Reportes = ({ onVolver }: { onVolver: () => void }) => {
           onClick={onVolver}
           className="w-full mt-8 bg-transparent text-red-700 dark:text-red-600 font-bold py-3 hover:bg-red-600 hover:text-white dark:hover:text-black transition-all uppercase tracking-widest border border-red-600 dark:border-red-600 text-sm"
         >
-          [ SALIR DE REPORTES ]
+          {t("reportes.buttons.exit")}
         </button>
       </div>
     </div>

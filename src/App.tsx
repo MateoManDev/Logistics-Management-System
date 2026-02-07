@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// 1. IMPORTAR SONNER
 import { Toaster } from "sonner";
 
 import { AdminMenu } from "./components/Admin";
@@ -12,6 +11,10 @@ import { SilosYRechazos } from "./components/SilosYRechazos";
 import { MenuDashboard } from "./components/MenuDashboard";
 import { GestionFlota } from "./components/GestionFlota";
 import { LandingPage } from "./components/LandingPage";
+import { SettingsModal } from "./components/SettingsModal";
+
+// Importamos la configuración i18n
+import "./i18n";
 
 type Seccion =
   | "LANDING"
@@ -26,10 +29,11 @@ type Seccion =
   | "FLOTA";
 
 const App = () => {
-  // Inicializamos leyendo el HASH de la URL si existe, sino LANDING
   const [vista, setVista] = useState<Seccion>(() => {
-    const hash = window.location.hash.replace("#", "").toUpperCase();
-    // Validamos si el hash es una sección válida, sino va a LANDING
+    const hash = window.location.hash
+      .replace("#", "")
+      .split("/")[0]
+      .toUpperCase();
     const seccionesValidas = [
       "MENU",
       "ADMIN",
@@ -45,51 +49,43 @@ const App = () => {
   });
 
   const [theme, setTheme] = useState(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined")
       return localStorage.getItem("theme") || "dark";
-    }
     return "dark";
   });
 
-  // --- LÓGICA DE NAVEGACIÓN (HISTORIAL DEL NAVEGADOR) ---
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // 1. Cuando cambia la 'vista', actualizamos la URL (pushState)
   useEffect(() => {
-    const hashActual = window.location.hash.replace("#", "");
-    if (hashActual !== vista) {
-      // Guardamos en el historial para que el botón "Atrás" funcione
+    const root = window.document.documentElement;
+    if (theme === "dark") root.classList.add("dark");
+    else root.classList.remove("dark");
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  // Manejo de historial del navegador
+  useEffect(() => {
+    const hashActual = window.location.hash
+      .replace("#", "")
+      .split("/")[0]
+      .toUpperCase();
+    if (hashActual !== vista && vista !== "LANDING") {
       window.history.pushState(null, "", `#${vista}`);
     }
   }, [vista]);
 
-  // 2. Escuchar el botón "Atrás" del navegador
   useEffect(() => {
     const handlePopState = () => {
-      const hash = window.location.hash.replace("#", "").toUpperCase();
-      // Si el hash está vacío (root), volvemos a LANDING
-      if (!hash) {
-        setVista("LANDING");
-      } else {
-        // Si hay hash, navegamos a esa vista
-        setVista(hash as Seccion);
-      }
+      const hash = window.location.hash
+        .replace("#", "")
+        .split("/")[0]
+        .toUpperCase();
+      if (!hash) setVista("LANDING");
+      else setVista((prev) => (prev !== hash ? (hash as Seccion) : prev));
     };
-
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
-
-  // --- FIN LÓGICA DE NAVEGACIÓN ---
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
@@ -100,6 +96,7 @@ const App = () => {
       case "LANDING":
         return <LandingPage onIngresar={() => setVista("MENU")} />;
       case "MENU":
+        // YA NO NECESITA PROPS DE IDIOMA
         return (
           <MenuDashboard
             alSeleccionar={(s) => setVista(s as Seccion)}
@@ -123,7 +120,6 @@ const App = () => {
       case "FLOTA":
         return <GestionFlota onVolver={() => setVista("MENU")} />;
       default:
-        // Fallback por seguridad
         return (
           <MenuDashboard
             alSeleccionar={(s) => setVista(s as Seccion)}
@@ -146,11 +142,32 @@ const App = () => {
       />
 
       <button
-        onClick={toggleTheme}
-        className="fixed top-4 right-4 z-[2000] px-4 py-2 text-[10px] font-bold border-2 border-gray-400 dark:border-gray-800 bg-white dark:bg-black shadow-lg hover:border-cyan-500 transition-colors uppercase tracking-widest"
+        onClick={() => setIsSettingsOpen(true)}
+        className="fixed top-4 right-4 z-[2000] p-3 text-gray-500 hover:text-cyan-600 dark:text-gray-400 dark:hover:text-cyan-400 bg-white dark:bg-black/50 border border-gray-300 dark:border-gray-800 rounded-full shadow-lg transition-all hover:rotate-90 hover:scale-110"
+        title="Configuración"
       >
-        {theme === "dark" ? "[ MODO CLARO ]" : "[ MODO OSCURO ]"}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
       </button>
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        theme={theme}
+        toggleTheme={toggleTheme}
+      />
 
       {renderContenido()}
     </div>

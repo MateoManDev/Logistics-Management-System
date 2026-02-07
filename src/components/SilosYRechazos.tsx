@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// FIX: Importación correcta del locale
-import { es } from "date-fns/locale";
-// 1. IMPORTAR SONNER
+import { es, enUS } from "date-fns/locale"; // Importamos ambos
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next"; // <--- Importamos Hook
 
 registerLocale("es", es);
+registerLocale("en", enUS);
 
 // --- INTERFACES ---
 interface Operacion {
@@ -38,6 +38,8 @@ interface ModalState {
 }
 
 export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
+  const { t, i18n } = useTranslation(); // <--- Hook
+
   const [operaciones] = useLocalStorage<Operacion[]>("operaciones_dat", []);
   const [silos, setSilos] = useLocalStorage<Silo[]>("silos_dat", []);
   const [productos] = useLocalStorage<Producto[]>("productos_dat", []);
@@ -84,13 +86,15 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
 
     // 1. Validaciones con TOAST
     if (!cantidadSalida || kilos <= 0) {
-      toast.error("ERROR: INGRESE UNA CANTIDAD MAYOR A 0");
+      toast.error(t("silos.errors.invalidQty"));
       return;
     }
 
     if (kilos > siloAjuste.stock) {
-      toast.error("STOCK INSUFICIENTE", {
-        description: `El silo solo tiene ${siloAjuste.stock} KG disponibles.`,
+      toast.error(t("silos.errors.insufficientStock"), {
+        description: t("silos.errors.insufficientDesc", {
+          amount: siloAjuste.stock,
+        }),
       });
       return;
     }
@@ -98,7 +102,10 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
     // 2. Pedir confirmación con el Modal (Acción Crítica)
     setModal({
       isOpen: true,
-      message: `¿Confirmar salida de ${kilos.toLocaleString()} KG del ${siloAjuste.nombre}?`,
+      message: t("silos.modals.confirmOutput", {
+        amount: kilos.toLocaleString(),
+        silo: siloAjuste.nombre,
+      }),
       onConfirm: () => {
         // Ejecutar la resta de stock
         const nuevosSilos = silos.map((s) =>
@@ -108,8 +115,11 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
         setSilos(nuevosSilos);
 
         // 3. Notificación de Éxito
-        toast.success("SALIDA REGISTRADA CORRECTAMENTE", {
-          description: `Nuevo stock en ${siloAjuste.nombre}: ${(siloAjuste.stock - kilos).toLocaleString()} KG`,
+        toast.success(t("silos.toast.success"), {
+          description: t("silos.toast.desc", {
+            silo: siloAjuste.nombre,
+            amount: (siloAjuste.stock - kilos).toLocaleString(),
+          }),
         });
 
         setSiloAjuste(null);
@@ -127,14 +137,14 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
       >
         <div className="border-2 border-yellow-500 dark:border-yellow-600 p-8 bg-white dark:bg-[#0a0a0a] shadow-xl dark:shadow-[0_0_20px_rgba(234,179,8,0.2)] w-full max-w-2xl transition-colors duration-300">
           <h2 className="text-center mb-8 text-xl font-bold tracking-[0.2em] text-yellow-600 dark:text-yellow-500 border-b-2 border-yellow-600 dark:border-yellow-900 pb-4 uppercase italic">
-            [ Gestión y Monitoreo ]
+            {t("silos.title")}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* COLUMNA IZQUIERDA: SILOS INTERACTIVOS */}
             <div>
               <p className="text-[10px] text-yellow-800 dark:text-yellow-700 uppercase tracking-widest mb-4 font-bold border-b border-yellow-200 dark:border-yellow-900/30 pb-1">
-                ➤ Stock en Planta
+                {t("silos.stockTitle")}
               </p>
               <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
                 {silos.length > 0 ? (
@@ -181,7 +191,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
 
                         <div className="flex justify-between items-center mb-2">
                           <span className="text-[8px] text-gray-600 dark:text-gray-600 uppercase font-bold tracking-tighter">
-                            Libre:{" "}
+                            {t("silos.free")}{" "}
                             {(silo.capacidad - silo.stock).toLocaleString()} KG
                           </span>
                           <span className="text-[9px] text-gray-700 dark:text-gray-500 font-bold">
@@ -195,14 +205,14 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                           onClick={() => abrirPanelSalida(silo)}
                           className="w-full text-[9px] border border-yellow-600/50 dark:border-yellow-900/50 text-yellow-800 dark:text-yellow-700 hover:bg-yellow-500 dark:hover:bg-yellow-900 hover:text-white uppercase py-1 transition-colors font-bold pointer-events-auto"
                         >
-                          Registrar Salida / Venta
+                          {t("silos.buttons.registerOutput")}
                         </button>
                       </div>
                     );
                   })
                 ) : (
                   <p className="text-gray-500 dark:text-gray-700 text-[10px] italic">
-                    No hay silos configurados en administración.
+                    {t("silos.emptySilos")}
                   </p>
                 )}
               </div>
@@ -211,14 +221,13 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
             {/* COLUMNA DERECHA: RECHAZOS */}
             <div className="flex flex-col">
               <p className="text-[10px] text-red-700 dark:text-red-700 uppercase tracking-widest mb-4 font-bold border-b border-red-200 dark:border-red-900/30 pb-1">
-                ➤ Historial de Rechazos
+                {t("silos.rejectionTitle")}
               </p>
 
               <DatePicker
                 selected={selectedDate}
-                // FIX: Tipado explícito para que TS no marque error implícito
                 onChange={(date: Date | null) => setSelectedDate(date)}
-                locale="es"
+                locale={i18n.language === "EN" ? "en" : "es"}
                 dateFormat="dd/MM/yyyy"
                 className="w-full bg-gray-50 dark:bg-black border border-gray-300 dark:border-gray-700 p-2 text-gray-900 dark:text-white text-xs mb-4 outline-none focus:border-yellow-500"
               />
@@ -239,14 +248,14 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                         </span>
                       </div>
                       <span className="text-[8px] text-red-800 dark:text-red-900 uppercase font-bold mt-0.5">
-                        Motivo: Fallo en parámetros de calidad
+                        {t("silos.reason")}
                       </span>
                     </div>
                   ))
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center opacity-30 italic">
                     <p className="text-gray-400 dark:text-gray-500 text-[9px] uppercase">
-                      Sin rechazos registrados
+                      {t("silos.emptyRejections")}
                     </p>
                   </div>
                 )}
@@ -254,10 +263,10 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
 
               <div className="mt-4 p-3 bg-red-100 dark:bg-red-900/10 border border-red-200 dark:border-red-900/40 text-center">
                 <span className="text-[10px] text-red-700 uppercase font-bold">
-                  Total del día:{" "}
+                  {t("silos.totalDay")}{" "}
                 </span>
                 <span className="text-gray-900 dark:text-white font-bold ml-2">
-                  {camionesRechazados.length} Unidades
+                  {camionesRechazados.length} {t("silos.units")}
                 </span>
               </div>
             </div>
@@ -269,16 +278,15 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
               onClick={() => setShowManual(!showManual)}
               className="w-full bg-gray-200 dark:bg-gray-800/50 p-2 text-[10px] text-yellow-700 dark:text-yellow-500 flex justify-between items-center hover:bg-gray-300 dark:hover:bg-gray-800 transition-colors uppercase font-bold italic"
             >
-              <span>{showManual ? "▼" : "▶"} Manual de Operaciones</span>
+              <span>
+                {showManual ? "▼" : "▶"} {t("silos.buttons.manual")}
+              </span>
             </button>
             {showManual && (
               <div className="p-3 bg-gray-100 dark:bg-black/30 border border-gray-300 dark:border-gray-800 text-[9px] text-gray-600 dark:text-gray-500 space-y-2 italic">
-                <p>
-                  • Use "REGISTRAR SALIDA" para descontar stock (ventas,
-                  traslados).
-                </p>
-                <p>• Los silos muestran la ocupación en tiempo real.</p>
-                <p>• Si supera el 90%, el sistema indicará estado crítico.</p>
+                <p>{t("silos.manual.p1")}</p>
+                <p>{t("silos.manual.p2")}</p>
+                <p>{t("silos.manual.p3")}</p>
               </div>
             )}
           </div>
@@ -287,7 +295,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
             onClick={onVolver}
             className="w-full text-red-700 text-[10px] font-bold border-t border-gray-300 dark:border-gray-800 pt-4 text-center mt-6 uppercase hover:text-red-500 transition-all"
           >
-            &lt;&lt; Volver al Menú Principal
+            {t("silos.buttons.back")}
           </button>
         </div>
       </div>
@@ -298,19 +306,20 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
           <div className="w-full max-w-sm border-2 border-yellow-500 dark:border-yellow-600 bg-white dark:bg-[#0a0a0a] p-6 shadow-2xl animate-in zoom-in duration-200">
             <div className="text-center border-b border-yellow-200 dark:border-yellow-900/50 pb-4 mb-4">
               <h3 className="text-yellow-600 dark:text-yellow-500 font-bold uppercase tracking-widest text-sm">
-                Registro de Salida
+                {t("silos.outputPanel.title")}
               </h3>
               <p className="text-gray-900 dark:text-white font-bold text-xs mt-1">
                 {siloAjuste.nombre}
               </p>
               <p className="text-[9px] text-gray-500 italic uppercase">
-                Prod: {obtenerNombreProducto(siloAjuste.codprod)}
+                {t("calidad.form.prod")}:{" "}
+                {obtenerNombreProducto(siloAjuste.codprod)}
               </p>
             </div>
 
             <div className="flex flex-col gap-2 mb-6">
               <label className="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-bold">
-                Kilos a descontar:
+                {t("silos.outputPanel.label")}
               </label>
               <input
                 type="number"
@@ -321,22 +330,23 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
                 onChange={(e) => setCantidadSalida(e.target.value)}
               />
               <p className="text-[9px] text-right text-gray-500 dark:text-gray-600">
-                Stock actual: {siloAjuste.stock.toLocaleString()} KG
+                {t("silos.outputPanel.currentStock")}{" "}
+                {siloAjuste.stock.toLocaleString()} KG
               </p>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={() => setSiloAjuste(null)}
-                className="flex-1 border border-gray-300 dark:border-gray-700 text-gray-500 py-2 text-[10px] uppercase font-bold hover:bg-gray-100 dark:hover:text-white transition-colors"
+                className="flex-1 border border-gray-300 dark:border-gray-700 text-gray-500 py-2 text-[10px] uppercase font-bold hover:bg-gray-100  dark:hover:text-white dark:hover:bg-black transition-colors"
               >
-                Cancelar
+                {t("silos.buttons.cancel")}
               </button>
               <button
                 onClick={confirmarSalida}
                 className="flex-1 bg-yellow-500 dark:bg-yellow-600 text-white dark:text-black py-2 text-[10px] uppercase font-bold hover:bg-yellow-600 dark:hover:bg-yellow-500 transition-colors"
               >
-                Procesar
+                {t("silos.buttons.process")}
               </button>
             </div>
           </div>
@@ -348,7 +358,7 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-transparent backdrop-blur-sm pointer-events-auto transition-all duration-300">
           <div className="w-full max-w-sm border-2 p-6 bg-white dark:bg-[#0a0a0a] shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in duration-200 border-yellow-500 dark:border-yellow-600 shadow-yellow-500/40 dark:shadow-yellow-900/40">
             <h4 className="text-center font-bold mb-4 tracking-widest uppercase text-[10px] text-yellow-600 dark:text-yellow-500">
-              [ ? ] CONFIRMAR
+              {t("common.confirm")}
             </h4>
 
             <p className="text-gray-900 dark:text-white text-center text-[11px] mb-6 font-mono uppercase italic leading-tight">
@@ -358,16 +368,16 @@ export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
             <div className="flex gap-2">
               <button
                 onClick={closeModal}
-                className="flex-1 border border-gray-300 dark:border-gray-700 text-gray-500 py-3 text-[10px] uppercase font-bold hover:bg-gray-100 dark:hover:text-white transition-colors"
+                className="flex-1 border border-gray-300 dark:border-gray-700 text-gray-500 py-3 text-[10px] uppercase font-bold  hover:bg-gray-100 dark:hover:text-white dark:hover:bg-black  transition-colors"
               >
-                Cancelar
+                {t("common.cancel")}
               </button>
 
               <button
                 onClick={modal.onConfirm}
                 className="flex-1 py-3 text-[10px] font-bold uppercase transition-all bg-yellow-500 text-white dark:text-black hover:bg-yellow-600 dark:hover:bg-yellow-500"
               >
-                ACEPTAR
+                {t("common.accept")}
               </button>
             </div>
           </div>
