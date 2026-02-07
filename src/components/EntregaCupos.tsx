@@ -10,7 +10,7 @@ import * as z from "zod";
 
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// Importamos 'es' y 'en' para el datepicker
+
 import { es, enUS } from "date-fns/locale";
 
 registerLocale("es", es);
@@ -201,7 +201,6 @@ export const EntregaCupos = ({ onVolver }: { onVolver: () => void }) => {
             <div className="flex flex-col gap-1">
               <label className="text-xs text-gray-600 dark:text-gray-500 uppercase tracking-widest">
                 {t("cupos.labels.product")}{" "}
-                {/* AQUÍ ESTABA EL ERROR: Usar message dinámico */}
                 {errors.codProd && (
                   <span className="text-red-500 font-bold ml-2 text-[10px]">
                     * {errors.codProd.message}

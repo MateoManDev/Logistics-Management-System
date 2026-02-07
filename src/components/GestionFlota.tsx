@@ -755,10 +755,6 @@ export const GestionFlota = ({ onVolver }: { onVolver: () => void }) => {
                         </p>
                       </div>
                       <div className="relative">
-                        {/* --- CORRECCIÓN AQUÍ ---
-                            Se eliminó el <div> con el emoji absoluto.
-                            Se cambió pl-6 a pl-2 para que el texto (que ya tiene emoji) se vea bien.
-                        */}
                         <select
                           value={c.estado}
                           onChange={(e) =>

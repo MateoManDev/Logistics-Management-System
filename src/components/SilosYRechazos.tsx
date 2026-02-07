@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { es, enUS } from "date-fns/locale"; // Importamos ambos
+import { es, enUS } from "date-fns/locale";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next"; // <--- Importamos Hook
+import { useTranslation } from "react-i18next";
 
 registerLocale("es", es);
 registerLocale("en", enUS);
@@ -38,7 +38,7 @@ interface ModalState {
 }
 
 export const SilosYRechazos = ({ onVolver }: { onVolver: () => void }) => {
-  const { t, i18n } = useTranslation(); // <--- Hook
+  const { t, i18n } = useTranslation();
 
   const [operaciones] = useLocalStorage<Operacion[]>("operaciones_dat", []);
   const [silos, setSilos] = useLocalStorage<Silo[]>("silos_dat", []);

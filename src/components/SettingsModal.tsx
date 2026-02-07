@@ -1,12 +1,11 @@
 import React from "react";
-import { useTranslation } from "react-i18next"; // <--- IMPORTAMOS
+import { useTranslation } from "react-i18next";
 
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   theme: string;
   toggleTheme: () => void;
-  // Ya no necesitamos recibir language ni setLanguage desde fuera
 }
 
 export const SettingsModal = ({
@@ -15,17 +14,17 @@ export const SettingsModal = ({
   theme,
   toggleTheme,
 }: SettingsModalProps) => {
-  const { i18n } = useTranslation(); // <--- Hook para controlar el idioma
+  const { i18n } = useTranslation();
 
   if (!isOpen) return null;
 
   // Función para cambiar idioma
   const changeLanguage = (lang: string) => {
     i18n.changeLanguage(lang);
-    localStorage.setItem("lang", lang); // Persistencia simple
+    localStorage.setItem("lang", lang);
   };
 
-  const currentLang = i18n.language; // Idioma actual (ES o EN)
+  const currentLang = i18n.language;
 
   return (
     <div className="fixed inset-0 z-[3000] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">

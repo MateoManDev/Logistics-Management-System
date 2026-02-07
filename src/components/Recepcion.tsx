@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next"; // <--- Importamos
+import { useTranslation } from "react-i18next";
 
 // --- INTERFACES ---
 interface Operacion {
@@ -26,7 +26,7 @@ interface ModalState {
 }
 
 export const Recepcion = ({ onVolver }: { onVolver: () => void }) => {
-  const { t } = useTranslation(); // <--- Hook
+  const { t } = useTranslation();
   const [operaciones, setOperaciones] = useLocalStorage<Operacion[]>(
     "operaciones_dat",
     [],
@@ -56,7 +56,6 @@ export const Recepcion = ({ onVolver }: { onVolver: () => void }) => {
     // 1. Abrir Modal de Confirmación
     setModal({
       isOpen: true,
-      // Usamos interpolación para pasar la patente al texto traducido
       message: t("recepcion.modal.confirmMessage", {
         patente: opSeleccionada.patente,
       }),

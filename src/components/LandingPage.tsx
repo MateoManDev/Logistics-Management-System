@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTranslation, Trans } from "react-i18next"; // Importamos Trans para permitir HTML en traducciones (negritas)
+import { useTranslation, Trans } from "react-i18next";
 
 export const LandingPage = ({ onIngresar }: { onIngresar: () => void }) => {
   const [showDocs, setShowDocs] = useState(false);
@@ -7,7 +7,6 @@ export const LandingPage = ({ onIngresar }: { onIngresar: () => void }) => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-white font-mono flex flex-col relative overflow-hidden transition-colors duration-300 selection:bg-cyan-500 selection:text-black">
-      {/* FONDO ANIMADO (Efecto Grid - Solo visible en Dark Mode para limpieza) */}
       <div
         className="absolute inset-0 z-0 opacity-20 pointer-events-none hidden dark:block"
         style={{
@@ -17,7 +16,7 @@ export const LandingPage = ({ onIngresar }: { onIngresar: () => void }) => {
         }}
       ></div>
 
-      {/* --- HERO SECTION (Principal) --- */}
+      {/* --- SECTION PRINCIPAL --- */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center p-6 text-center animate-in fade-in duration-700">
         <div className="mb-8">
           <span className="bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-400 border border-cyan-300 dark:border-cyan-800 px-3 py-1 text-[10px] uppercase tracking-[0.3em] rounded-full">
@@ -169,8 +168,6 @@ export const LandingPage = ({ onIngresar }: { onIngresar: () => void }) => {
           </div>
         </section>
       )}
-
-      {/* FOOTER */}
       <footer className="relative z-10 p-6 text-center text-[10px] text-gray-500 dark:text-gray-600 border-t border-gray-300 dark:border-gray-900">
         <p>{t("landing.footer")}</p>
       </footer>

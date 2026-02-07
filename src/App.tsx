@@ -13,7 +13,6 @@ import { GestionFlota } from "./components/GestionFlota";
 import { LandingPage } from "./components/LandingPage";
 import { SettingsModal } from "./components/SettingsModal";
 
-// Importamos la configuración i18n
 import "./i18n";
 
 type Seccion =
@@ -96,7 +95,6 @@ const App = () => {
       case "LANDING":
         return <LandingPage onIngresar={() => setVista("MENU")} />;
       case "MENU":
-        // YA NO NECESITA PROPS DE IDIOMA
         return (
           <MenuDashboard
             alSeleccionar={(s) => setVista(s as Seccion)}

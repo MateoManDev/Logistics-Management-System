@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { useTranslation } from "react-i18next"; // <--- Importamos Hook
+import { useTranslation } from "react-i18next";
 
 // --- INTERFACES ---
 interface Operacion {
@@ -18,7 +18,7 @@ interface Producto {
 }
 
 export const Reportes = ({ onVolver }: { onVolver: () => void }) => {
-  const { t } = useTranslation(); // <--- Hook de traducción
+  const { t } = useTranslation();
   const [operaciones] = useLocalStorage<Operacion[]>("operaciones_dat", []);
   const [productos] = useLocalStorage<Producto[]>("productos_dat", []);
   const [filtroPeriodo, setFiltroPeriodo] = useState("HOY");

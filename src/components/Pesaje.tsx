@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next"; // <--- Importamos
+import { useTranslation } from "react-i18next";
 
 // --- LIBRERÍAS DE VALIDACIÓN ---
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -46,7 +46,7 @@ interface ModalState {
 }
 
 export const Pesaje = ({ onVolver }: { onVolver: () => void }) => {
-  const { t } = useTranslation(); // <--- Hook de traducción
+  const { t } = useTranslation();
 
   // DATA
   const [operaciones, setOperaciones] = useLocalStorage<Operacion[]>(

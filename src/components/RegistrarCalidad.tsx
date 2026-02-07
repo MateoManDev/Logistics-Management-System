@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { toast } from "sonner";
-import { useTranslation, Trans } from "react-i18next"; // <--- Importamos Hooks
+import { useTranslation, Trans } from "react-i18next";
 
 // --- LIBRERÍAS DE VALIDACIÓN ---
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -31,7 +31,7 @@ interface Rubro {
 }
 
 export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
-  const { t } = useTranslation(); // <--- Hook de traducción
+  const { t } = useTranslation();
 
   const [operaciones, setOperaciones] = useLocalStorage<Operacion[]>(
     "operaciones_dat",
@@ -52,8 +52,6 @@ export const RegistrarCalidad = ({ onVolver }: { onVolver: () => void }) => {
   );
 
   // --- ESQUEMA DINÁMICO ---
-  // Lo definimos dentro para poder usar t() en los mensajes si quisiéramos,
-  // aunque aquí la validación es simple.
   const calidadSchema = z.record(
     z.string(),
     z.string().min(1, t("calidad.form.required")).pipe(z.coerce.number()),

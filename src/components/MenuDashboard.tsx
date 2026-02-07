@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { useTranslation } from "react-i18next"; // <--- 1. IMPORTAR HOOK
+import { useTranslation } from "react-i18next";
 
 interface Operacion {
   estado: "P" | "A" | "C" | "B" | "F" | "R";
@@ -15,11 +15,10 @@ interface Silo {
 interface DashboardProps {
   alSeleccionar: (vista: string) => void;
   onLogout: () => void;
-  // lang: "ES" | "EN"; <--- 2. ELIMINAR PROP LANG
 }
 
 export const MenuDashboard = ({ alSeleccionar, onLogout }: DashboardProps) => {
-  const { t } = useTranslation(); // <--- 3. USAR HOOK
+  const { t } = useTranslation();
   const [operaciones] = useLocalStorage<Operacion[]>("operaciones_dat", []);
   const [silos] = useLocalStorage<Silo[]>("silos_dat", []);
 

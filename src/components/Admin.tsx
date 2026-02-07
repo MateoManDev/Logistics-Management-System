@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useTranslation } from "react-i18next"; // <--- HOOK DE TRADUCCIÓN
+import { useTranslation } from "react-i18next";
 
 // --- INTERFACES DE DATOS ---
 interface Producto {
@@ -49,7 +49,7 @@ interface ModalState {
 
 type SubVista = "PRINCIPAL" | "PRODUCTOS" | "RUBROS" | "SILOS" | "RXP";
 
-// --- 1. COMPONENTE DE AYUDA (MODIFICADO PARA RECIBIR PROPS) ---
+// --- 1. COMPONENTE DE AYUDA
 const SeccionAyuda = ({
   isOpen,
   onToggle,
@@ -103,10 +103,9 @@ const PanelGestion = ({
   keyNombre,
 }: any) => {
   const { t } = useTranslation();
-  // ESTADO PARA CONTROLAR EL MANUAL
+
   const [showManual, setShowManual] = useState(false);
 
-  // DEFINICIÓN DE ESQUEMAS DENTRO DEL COMPONENTE PARA USAR t()
   const codigoRule = z
     .string()
     .min(2, t("common.errors.min2"))
@@ -360,10 +359,6 @@ const PanelGestion = ({
             )}
           </form>
         </div>
-
-        {/* AQUÍ ESTÁ EL CAMBIO CLAVE:
-            Se oculta la lista cuando showManual es true.
-        */}
         {!showManual && (
           <div className="flex-1 min-h-[15vh] overflow-y-auto custom-scrollbar border-t border-gray-300 dark:border-gray-800 pt-4">
             <div className="flex flex-col gap-2">
@@ -456,7 +451,7 @@ const PanelGestion = ({
   );
 };
 
-// --- 3. COMPONENTE PRINCIPAL (AdminMenu) ---
+// --- 3.AdminMenu ---
 export const AdminMenu = ({ onVolver }: { onVolver: () => void }) => {
   const { t } = useTranslation();
 
