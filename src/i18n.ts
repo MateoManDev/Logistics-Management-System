@@ -361,7 +361,7 @@ const resources = {
           products: "Productos",
           categories: "Rubros",
           silos: "Silos",
-          rxp: "Rubros x Producto",
+          rxp: "Rubros por Producto",
         },
         buttons: {
           save: "[ GUARDAR CAMBIOS ]",
@@ -768,7 +768,7 @@ const resources = {
           products: "Products",
           categories: "Categories",
           silos: "Silos",
-          rxp: "RxP Relation",
+          rxp: "Quality Factors per Product",
         },
         buttons: {
           save: "[ SAVE CHANGES ]",
